@@ -43,7 +43,7 @@ function genPlacemark(wp) {
   return '     <Placemark>\n' +
   '      <name>'+wp.name+'</name>\n' +
   '      <Point>\n' +
-  '        <coordinates>'+wp.lat+','+wp.lon+',0.0</coordinates>\n' +
+  '        <coordinates>'+wp.lon+','+wp.lat+',0.0</coordinates>\n' +
   '      </Point>\n' +
   '    </Placemark>\n';
 }
@@ -56,7 +56,7 @@ function routePrefix() {
   '        <coordinates>\n';
 }
 function genCoord(wp) {
-  return "           "+wp.lat+","+wp.lon+",0.0\n";
+  return "           "+wp.lon+","+wp.lat+",0.0\n";
 }
 
 function routeSuffix() {
