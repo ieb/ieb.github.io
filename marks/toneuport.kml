@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<kml xmlns:sg="http://www.sailgrib.com" xmlns="http://www.opengis.net/kml/2.2">
+	<Document>
+		<name>toneuport.kml</name>
+		<description>Powered by SailGrib (http://www.sailgrib.com)</description>
+		<ExtendedData xmlns:prefix="sg">
+			<sg:version>1.0</sg:version>
+		</ExtendedData>
+		<Folder>
+			<name>toneuport.kml</name>
+			<description></description>
+			<ExtendedData xmlns:prefix="sg">
+			<sg:type>route</sg:type>
+			</ExtendedData>
+			<Placemark>
+				<name>WP_0</name>
+				<Point>
+					<coordinates>1.3111495971679688,51.929024666744425,0.0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>WP_1</name>
+				<Point>
+					<coordinates>1.39801025390625,51.891537136208306,0.0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>WP_2</name>
+				<Point>
+					<coordinates>1.6050338745117188,51.79502722582914,0.0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>WP_3</name>
+				<Point>
+					<coordinates>1.6661453247070312,51.63911542775131,0.0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>WP_4</name>
+				<Point>
+					<coordinates>2.0043182373046875,51.5561552677701,0.0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>WP_5</name>
+				<Point>
+					<coordinates>2.465057373046875,51.30743796487255,0.0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>WP_6</name>
+				<Point>
+					<coordinates>2.7167129516601562,51.1580308991086,0.0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark>
+				<name>Route</name>
+				<Description>SailGribRoute</Description>
+				<LineString>
+					<tessellate>1</tessellate>
+					<coordinates>
+					1.3111495971679688,51.929024666744425,0.0
+					1.39801025390625,51.891537136208306,0.0
+					1.6050338745117188,51.79502722582914,0.0
+					1.6661453247070312,51.63911542775131,0.0
+					2.0043182373046875,51.5561552677701,0.0
+					2.465057373046875,51.30743796487255,0.0
+					2.7167129516601562,51.1580308991086,0.0
+					</coordinates>
+				</LineString>
+			</Placemark>
+		</Folder>
+	</Document>
+</kml>
