@@ -8,4 +8,5 @@
 
 # Notes
 
-* [CANBus-and-NMEA200Notes.md]
+* [CANBus-and-NMEA200Notes](CANBus-and-NMEA200Notes.md)
+* [SignalK Raspberry Pi setup](SignalKRaspberryPisetup.md)
