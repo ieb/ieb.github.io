@@ -49,15 +49,15 @@ The Pi is a 3B because it is powerful enough and cold enough to be in a IP67 box
     
 ## Node
 
-Downloaded from https://nodejs.org/dist/v12.14.1/node-v12.14.1-linux-armv7l.tar.xz into /opt/node-v12.14.1 symlink /usr/local/bin etc
+Downloaded from [https://nodejs.org/dist/v12.14.1/node-v12.14.1-linux-armv7l.tar.xz](https://nodejs.org/dist/v12.14.1/node-v12.14.1-linux-armv7l.tar.xz) into /opt/node-v12.14.1 symlink /usr/local/bin etc
 
 ## Prometheus
 
-as per https://github.com/ieb/signalk-prometheus-exporter#setup-on-a-pi
+as per [https://github.com/ieb/signalk-prometheus-exporter#setup-on-a-pi](https://github.com/ieb/signalk-prometheus-exporter#setup-on-a-pi)
 
 ## Grafana 
 
-as per https://grafana.com/grafana/download?platform=arm
+as per [Grafana install](https://grafana.com/grafana/download?platform=arm)
 
 
       sudo apt-get install -y adduser libfontconfig1
@@ -69,7 +69,7 @@ add Signalk dashboards (need to get into git somewhere)
 
 ## Network
 
-Default setup of the network is a standard Wifi. Onboard at sea with no internet it needs to be an AP as per https://www.raspberrypi.org/documentation/configuration/wireless/access-point.md
+Default setup of the network is a standard Wifi. Onboard at sea with no internet it needs to be an AP as per [Raspbery Pi Doc](https://www.raspberrypi.org/documentation/configuration/wireless/access-point.md)
 using 2 versions of /etc/dhcpcd.conf, one for Wifi client, one for AP its possible to switch between the 2
 
 There is probably more do add here.
