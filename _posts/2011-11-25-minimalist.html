@@ -1,0 +1,49 @@
+---
+layout: post
+title: Minimalism
+date: 2011-11-25 01:28:21.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags:
+- Apache Felix
+- Java API for RESTful Web Services
+- JAX-RS
+- osgi
+meta:
+  _edit_last: '3991311'
+  _wpas_done_twitter: '1'
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1512018890;}
+  _oembed_b668c63131e61c0a395428e117946cd1: "{{unknown}}"
+  _oembed_8dbc90a7be7afadbf1650a2ec3dbfb71: "{{unknown}}"
+  _oembed_fa35984cd7ac216379755e1d93a9476a: "{{unknown}}"
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2011/11/25/minimalist/"
+---
+<p>In spare moments between real work, I've been experimenting with a light weight content server for user generated content. In short, that means content in a hierarchical tree that is shallow and very wide. It doesn't preclude deep narrow trees, but wide and shallow is what it does best. Here are some of the things I wanted to do.</p>
+<p>I wanted to support the same type of RESTfull interface as seen in Sakai OAE's Nakamura and standards like Atom. By that I mean where the URL points to a resource, and actions expressed by the http methods, http protocol and markers in the URL modify what a RESTfull request does. In short, along the lines of the arguments in <a href="http://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">http://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven</a> which probably drove the thinking behind <a class="zem_slink" title="Apache Sling" href="http://en.wikipedia.org/wiki/Apache_Sling" rel="wikipedia">Sling</a> on which Nakamura is based. I mention Atom, simply because when you read the standard  it talks about the payload of a response, but makes no mention of how the URL should be structured to get that payload. It reinforces the earlier desire.</p>
+<p>I wanted the server to start as quickly as possible, and use as little memory  as possible. Ideally &lt; 10s and &lt; 20MB. Java applications have got a bad name for bloat but there is no reason they have to be huge to serve load. Why so small (in Java terms)? Why not, contrary to what most apps appear to do, memory is not there to waste?</p>
+<p>I wanted the core server to be support some standard protocols. eg <a class="zem_slink" title="WebDAV" href="http://en.wikipedia.org/wiki/WebDAV" rel="wikipedia">WebDav</a>, but I wanted to make it easy to extend. <a class="zem_slink" title="Java API for RESTful Web Services" href="http://en.wikipedia.org/wiki/Java_API_for_RESTful_Web_Services" rel="wikipedia">JAX-RS</a> (RestEasy) inside <a class="zem_slink" title="OSGi" href="http://en.wikipedia.org/wiki/OSGi" rel="wikipedia">OSGi</a> (Minimal Sling bootstrap + <a class="zem_slink" title="Apache Felix" href="http://en.wikipedia.org/wiki/Apache_Felix" rel="wikipedia">Apache Felix</a>)</p>
+<p>I wanted the request processing to be efficient. Stream all requests (commons-upload 1.2.1 with streaming, no writing to intermediate file or byte[] all of which involve high GC traffic and slow processing), all things only processed once and available via an Adaptable pattern, a concept strong in Sling. And requests handled by response objects, not servlets. Why ? So the response state can be thread unsafe, so a request can be suspended in memory and unbound from the thread. And the resolution binding requests to resources to responses to be handled entirely in memory by pointer avoiding iteration. Ok so the lookup of a resource might go through a cache, but the resolution through to resource is an in memory pointer operation.</p>
+<p>Where content is static, I wanted to keep it static. OS's have file systems that are efficient at storing files, efficient at loading those file from disk and eliminating disk access completely, so if the bulk of the static files that my application needs really are static, why not use the filesystem. Many applications seem to confuse statically deterministic and dynamic. If the all possibilities of can be computed at build time, and the resources requires to create and serve are not excessive, then the content is static. Whats excessive ? A production build that takes 15 minutes to process all possibilities once a day is better than continually wasting heat and power doing it all the time. I might be a bit more extreem in that view accepting that filling a TB disk with compiled state is better than continually rebuilding that state incrementally in user facing production requests. If a deployer wants to do something special (SAN, NAS, something cloud like) with that filesystem there are plenty of options. All of Httpd/Tomcat/Jetty are capable of serving static files in high 1000s of requests per second concurrent, so why not use that ability. Browser based apps need every bit of speed they can get for static data.</p>
+<p>The downside of all of this minimalism is a server that doesn't have lots of ways of doing the same thing. Unlike Nakamura, you can't write JSPs or JRuby servlets. It barely uses the OSGi Event system and has none of the sophistication of Jackrabbit. The core container is Apache Felix with the the Felix HttpSerivice running a minimalist Jetty. The Content System is Sparse Content Map, the search component is Solr as an OSGi bundle. Webdav is provided by Milton and Jax-RS by RestEasy. Cacheing is provided by <a class="zem_slink" title="Ehcache" href="http://en.wikipedia.org/wiki/Ehcache" rel="wikipedia">EhCache</a>. It starts in 8Mb in 12s, and after load drops back to about 10MB.</p>
+<p>Additional RESTfull services are creating in one of three ways.</p>
+<ol>
+<li>Registering a servlet with the Felix Http Service (whiteboard), which binds to a URL, breaking the desire that nothing should bind to fixed URLs.</li>
+<li>Creating a component that provides a marker service, picked up by the OSGi extension to RestEasy that registers that service as a JAX-RS bean.</li>
+<li>Creating a factory service that emits JAX-RS annotated classes that act as response objects. The factory is annotated with the type of requests it can deal with, and the response objects tell JAX-RS what they can do with the request. The annotations are discovered when the factory is registered with OSGi, and those annotations are compiled into a one step memory lookup. (single concurrent hashmap get)</li>
+</ol>
+<p>Methods 1 and 2 have complete control over the protocol and are wide open to abuse, method 3 follows a processing pattern closely related to Sling.</p>
+<h2>Integration testing</h2>
+<p>Well unit testing is obvious, we do it and we try and get 100% coverage of every use case that matters. In fact, if you work on a time an materials basis for anyone, you should read your contract carefully to work out if you have to fix mistakes at your own expense. If you do, then you will probably start writing more tests to prove your client that what you did works. Its no surprise, in other branches of Engineering, that acceptance testing is part of many contracts. I dont think an airline would take delivery of a new plane without starting the engines, or a shipping line take delivery of a super tanker without checking it floats. I am bemused that software engineers often get away with saying "its done", when clearly its not. Sure we all make mistakes, but delivering code without test coverage is like handing over a ship that sinks.</p>
+<p>Integration testing is less obvious. In Sling there is a set of integration tests that test just about everything against a running server. Its part of the standard build but lives in its one project. Its absolutely solid and ensures that nothing builds that is broken, but as an average mortal, I found it scary since when thing did break I had to work hard to find out why. Thats why in Nakamura we wrote all integration tests in scripts. Initially bash and perl then later Ruby. With hindsight this was a huge mistake. First, you had to configure your machine to run Ruby and all the extensions needed. Not too hard on Linux, but for a time, those on OSX would wait forever for ports to finish building some base library. Dependencies gone mad. Fine if you were one of the few who created the system and pulled everything in over many months, but hell for the newcomer. Mostly, the newcomer walks away, or tweets something that everyone ignores.</p>
+<p>The devs also get off the hook. New ones dont know where to write the tests, or have to learn Ruby (replace Ruby with whatever the script is). Old devs can sweep them under the carpet and when it gets to release time ignore the fact that 10% of the tests are still broken... because the didn't have time to maintain them 3 fridays ago at 18:45, just before they went to a party. The party where they zapped 1% of their brain cells including the ones that were remembering what they should have done at 18:49. Still they had a good time, the evening raised their morale, started a great weekend ready for the next week and besides, they had no intention of boarding the ship.</p>
+<p>So the integration testing here is done as java unit tests. If this was a c++ project they would be c++ unit tests. They are in the bundle where where the code they test is. They are run by "mvn -Pintegration test". Even the command says what is going to happen. It starts a full instance of the server (now 12s becomes an age), or uses one thats already running and runs the tests.  If your in eclipse, they can be run in eclipse, just as another test might, and being OSGi, the new code in the bundle can be redeployed to the running OSGi container. That way the dev creating the bundle can put their tests in their bundle and do integration testing with the same tools they did unit testing. No excuse. "find . -type d  -name integration | grep src/test  " finds  all integration tests, and by omission ships that sink.</p>

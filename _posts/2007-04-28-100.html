@@ -1,0 +1,35 @@
+---
+layout: post
+title: Spring 2 XML validation errors (cvc-elt.1)
+date: 2007-04-28 12:48:21.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '3991311'
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2007/04/28/100/"
+---
+<p>If you get one of these in Spring 2</p>
+<blockquote><p><code> org.springframework.beans.factory.BeanDefinitionStoreException: Line 5 in XML document from class path resource [applicationContext.xml] is invalid; nested exception is org.xml.sax.SAXParseException: cvc-elt.1: Cannot find the declaration of element 'beans'.<br />
+</code></p></blockquote>
+<p>Then you need to change your applicationContext.xml from</p>
+<blockquote><p><code></code><br />
+<code>       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"</code><br />
+<code> xsi:schemaLocation="http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"</code><br />
+<code>       &gt;  </code></p></blockquote>
+<p>To</p>
+<blockquote><p><code> </code><br />
+<code>       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"</code><br />
+<code>       xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"</code><br />
+<code>       &gt; </code></p></blockquote>
+<p>There may also be problems with local resolution of the xsd, but the Documentation on the web is wrong in a number of places.</p>

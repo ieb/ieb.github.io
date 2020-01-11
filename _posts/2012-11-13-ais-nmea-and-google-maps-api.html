@@ -1,0 +1,38 @@
+---
+layout: post
+title: AIS NMEA and Google Maps API
+date: 2012-11-13 07:41:32.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags:
+- AIS
+- English Channel
+- Google
+- Google Map
+- GPS navigation device
+meta:
+  _edit_last: '3991311'
+  publicize_reach: a:2:{s:7:"twitter";a:1:{i:77605;i:87;}s:2:"wp";a:1:{i:0;i:9;}}
+  publicize_twitter_user: _ieb_
+  _wpas_done_77605: '1'
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:54083831;b:1;}}
+  _wpas_skip_77605: '1'
+  _oembed_528d3153f82f93c67313afc02a1095a6: "{{unknown}}"
+  _oembed_306def614da20d716fbf4b7bf4cbea72: "{{unknown}}"
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2012/11/13/ais-nmea-and-google-maps-api/"
+---
+<p>Those who know me will know I like nothing better than to get well offshore away from any hope of network connectivity. It's like stepping back 20 years to before the internet and its blissfully quite. The only problem is that 20 years ago it was too quiet. Crossing the English Channel in thick fog with no radar and a Decca unit that could only be relied on to give you a fix to within a mile some of the time, made you glad to be alive when you stood on solid ground again. Rocks and strong currents round the <a href="http://en.wikipedia.org/wiki/Alderney">Alderney</a> race were not nearly as frightening as the St Malo ferry looming out of the fog, horns blaring, as if there was anything a 12m yacht could do in reply. After a white knuckle trips I bought a 16nm Radar which turned the unseen steel monster of the Channel into a passage like a tortoise crossing a freeway reading an ipod. I don't know which was better, trying to guess if the container ship making 25kn, 10nm away was going to pass in front or behind you, or placing your trust in the unseen ships crew who had spent the past 4 days rolling north through Biscay with no sleep.</p>
+<p>Those going to sea today will not experience any of this excitement. They will probably have at least 3 active GPS receivers on board and which will be able to tell them when they are at the bow, stern and sitting on or standing in the heads, (W/C for landlubber).  The second bit of kit that they will probably have is an <a href="http://en.wikipedia.org/wiki/Automatic_Identification_System">AIS</a> receiver. All ships now carry AIS transmitters, as do some yachts whose owners. Vanity domains for boat owners. AIS transmits on marine 2 marine <a class="zem_slink" title="Very high frequency" href="http://en.wikipedia.org/wiki/Very_high_frequency" target="_blank" rel="wikipedia">VHF</a> channels 161.975 MHz and 162.025 MHz using variants of TDMA sharing. The data that is transmitted  is in a standard form NMEA0183 which is the same standard as used in many older marine systems. In the case of AIS, the payload is 8 bit text containing 6bit data in 168bit payload containing a checksum. The information that's broadcast is mostly position  speed, course and identification of the sender, which although its intended mainly as a instant communication of intentions between large ships is also invaluable to any smaller craft in fog. Its like being on the bridge of all ships in VHF range at the same time and its relatively simple to calculate the closest point of approach (CPA) for all targets. Pre affordable radar, we used to guess CPA using our ears, and sometimes smell (you can smell a super tanker in a strong wind). With radar we used to try and guess the path of an approaching target from the screen. Easy on a stable platform, not so easy when your radome is doing the samba. Today we have speed and real course often to three significant figures.</p>
+<p>I now live about 20km from the Sea north of Sydney harbor. VHF is line of sight so I would have thought it was not going to be possible to receive VHF from that distance taking into account buildings and trees. Normal marine whip aerials probably would not work, but a strip of 300 Ohm ribbon cable cut precisely to length and tuned to resonate with 1/4 wavelengths at 162 MHz is receiving and decoding signals from Newcastle to the north and Wollongong to the south, around 80km in each direction. Not bad for $5 worth of cable. The receiver is a <a href="https://www.whitworths.com.au/main_itemdetail.asp?item=45797&amp;search123=AIS&amp;intAbsolutePage=1">cheap headless unit from ACR</a> that sends the NMEA0183 signals down a USB/serial port. A simple Python scripts receives and decodes the NMEA0183 stream, converting (using ais.py from GPSD project) it into JSON containing current position,  speed, <a class="zem_slink" title="Maritime Mobile Service Identity" href="http://en.wikipedia.org/wiki/Maritime_Mobile_Service_Identity" target="_blank" rel="wikipedia">MMSI number</a> and a host of other information. All very interesting, but not very visual. I could just use one of the many free apps to display the NMEA0183 information over TCP/UDP, but they are limited.</p>
+<p><a href="http://ianboston.files.wordpress.com/2012/11/screen-shot-2012-11-13-at-17-35-55.png"><img class="alignleft size-medium wp-image-818" title="Screen shot 2012-11-13 at 17.35.55" alt="" src="{{ site.baseurl }}/assets/screen-shot-2012-11-13-at-17-35-55.png?w=300" height="253" width="300" /></a>Google Maps v3 API allows Javascript to create an overlay of markers. So a few 100 lines of Javascript loads the json file into a browser every 15s and displays the results on an overlay on Goole Maps. Ships are red with a vector, the wake is green. Sydney is a good place to test this as nearly all the ferries in the harbor transmit AIS messages all the time. Its a busy place. Obviously using Google maps 100nm offshore isn't going to work. The next step is to load the Python onto a <a href="http://www.raspberrypi.org/">Raspbery Pi </a>board, plug in a USB Wifi dongle and create my own mobile wifi hotspot which an iPad loaded with marine charts can connect to, all for significantly less that 1 Amp. If your on 12V you care about juice. Having IP offshore does defeat the purpose of being there, I may have to turn it off from time to time to remind myself I am alive.</p>
+<p>This interface was just an exercise to validate the NMEA to TCP over Wifi sever works. If you want to know when you ship will come in, visit <a href="http://www.marinetraffic.com/ais/">http://www.marinetraffic.com/ais/</a>, but don't try and use it at sea.</p>

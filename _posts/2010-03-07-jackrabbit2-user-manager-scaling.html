@@ -1,0 +1,55 @@
+---
+layout: post
+title: Jackrabbit2 User Manager Scaling.
+date: 2010-03-07 11:09:13.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '3991311'
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1288785583";}
+  reddit: a:2:{s:5:"count";s:1:"0";s:4:"time";s:10:"1340262064";}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2010/03/07/jackrabbit2-user-manager-scaling/"
+---
+<p>In Jackrabbit 1.x the User manger (at least after 1.5) stored users in a security workspace within the repository. This was great, and works well upto about 1000 users. However it uses a structure where users are nested in the user that created the user. If if "admin" creates all your users, then there will be 1000 child nodes to the admin user node. Sadly, additions become slower the more child nodes there are. Pretty soon a number of things happen. The number of child nodes causes updates to be come so slow it hard to add users (&gt;5K users). This can be addressed by a sharding the child node path, avoiding large numbers of child nodes. Secondly (and this is harder to solve), the query that is used to find a user, or to check that the user doesn't exist somewhere becomes progressively more expensive. So that when you get to about 25K users the create user operation has slowed by an order of magnitude.  That may not sound too bad, since its not often that you want to create a user, however, retreval of a user that becomes slower as well since you cant calculate the location of the user node from the userID, and since this needs to be done on almost every request, it slows everything.</p>
+<p>Fortunately it looks like all of this has been fixed in Jackrabbit 2. Now the UserManager does not store users in a nested form, it has an autoscaling sharding mechanism and the search query generates results that are far more direct. Some of this is not enabled by default, but here is the config that makes it work.</p>
+<p>In repository.xml</p>
+<pre>&lt;!DOCTYPE Repository 
+       PUBLIC "-//The Apache Software Foundation//DTD Jackrabbit 2.0//EN"
+"http://jackrabbit.apache.org/dtd/repository-2.0.dtd"&gt;
+&lt;Repository&gt;
+     &lt;FileSystem&gt;
+        &lt;param name="path" value="${rep.home}/repository"/&gt;
+     &lt;/FileSystem&gt;
+     &lt;Security appName="Jackrabbit"&gt;
+        &lt;SecurityManager workspaceName="security"&gt;
+<strong>           &lt;UserManager&gt;
+             &lt;param name="defaultDepth" value="4" /&gt;
+             &lt;param name="autoExpandTree" value="true" /&gt;
+             &lt;param name="autoExpandSize" value="500" /&gt;
+           &lt;/UserManager&gt;
+</strong>        &lt;/SecurityManager&gt;
+        &lt;AccessManager&gt;
+        &lt;/AccessManager&gt;
+...</pre>
+<p>In tests in Sling I see no slowdown in user creation upto 10K node. With HTTP requests ranging from 12-25ms. To add those 10K nodes from a single request thread takes 6m4s, a rate of about 27/s. The same test performed with Sling on Jackrabbit 1.6 was averaging 6/s over 10K nodes. Concurrent add operations tend to speed this up further as the http cost is factored out. My laptop runs out of steam at about 70/s.</p>
+<p>User Node paths that are generated are of the form</p>
+<pre>.../t/te/testuser201003070946420-300</pre>
+<div>with auto scaling in operation they become</div>
+<div></div>
+<pre>.../t/te/tes/test/testu/testus/testuse/testuser/testuser2/testuser20/testuser201/testuser2010/testuser20100/testuser201003071035370-4998</pre>
+<div id="_mcePaste">However this is an extreem case where all the user ID's are almost identical.</div>
+<div></div>
+<div>Conclusion.</div>
+<div>If you have a app that has a lot of users, use Jackrabbit 2 not Jackrabbit 1.6, as it scales better.</div>
+<div></div>

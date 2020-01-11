@@ -1,0 +1,31 @@
+---
+layout: post
+title: Version on Create Concurrency
+date: 2010-11-02 16:50:52.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '3991311'
+  _wp_old_slug: ''
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1300451175";}
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1413239562;}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2010/11/02/version-on-create-concurrency/"
+---
+<p>In Jackrabbit 2.1.1 (possibly fixed in later version) if you create nodes with mix:versionable added to them, the version history will be created which will block other threads performing writes and Persistence manager level reads. If the persistence manager is a JDBC based persistence manager and other threads are attempting to find items that are not in the shared cache, reads will be also be blocked, as they need to access the database by reading. Remember the PM is a singled threaded transaction monitor in JR 2.1.1 and earlier. So creating an item with mix:versionable where many concurrent requests are performing the operation results in a thread trace as below (red == blocked threads).</p>
+<p><a href="http://ianboston.files.wordpress.com/2010/11/screen-shot-2010-11-02-at-16-33-25.png"><img class="alignnone size-full wp-image-383" title="Screen shot 2010-11-02 at 16.33.25" src="{{ site.baseurl }}/assets/screen-shot-2010-11-02-at-16-33-25.png" alt="" width="510" height="153" /></a></p>
+<p>&nbsp;</p>
+<p>Removing the mix:versionable, appears to remove almost all thread blocking as below. It may not look like it but in the case below there are more concurrent request running than in the example above, the time per request is significantly less.</p>
+<p><a href="http://ianboston.files.wordpress.com/2010/11/screen-shot-2010-11-02-at-16-34-05.png"><img class="alignnone size-full wp-image-384" title="Screen shot 2010-11-02 at 16.34.05" src="{{ site.baseurl }}/assets/screen-shot-2010-11-02-at-16-34-05.png" alt="" width="510" height="179" /></a></p>
+<p>&nbsp;</p>
+<p>So add mix:versionable only when you need to add it at the point of checkin.</p>

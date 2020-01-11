@@ -1,0 +1,75 @@
+---
+layout: post
+title: 'HowTo: add more than one source directory into a maven build'
+date: 2009-07-29 14:36:46.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags:
+- Apache Maven
+- Build Management
+- Java
+meta:
+  _edit_last: '3991311'
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1288785620";}
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1405030749;}
+  _wpas_skip_77605: '1'
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2009/07/29/howto-add-more-than-one-source-directory-into-a-maven-build/"
+---
+<p>There are more project builds that use code generators to convert model files or interface descriptions into code and associated resources. The normal approach is to generate the code every time and place it in the ..../target area of the build so that its gets built duging maven's compile phase. However there are times when you want to generate the code rarely, and have it form part of the code base. If this is the case, then putting it in the man source tree, with all the hand crafted code can be dangerous and confusing. Ideally generated code, even if you keep it for a long time, should really go in its own source tree. eg .../src-generated.</p>
+<p>The problem is, by default, maven only allows one source tree per project, and building a jar just for the generated code base might be too painful. There is no standard pom way of adding further source trees into the main maven build, but there is the maven build-helper-maven-plugin, that can amongst other things, inject additional source and resource locations into the build. The example below adds generated sources, tests and resources into a standard build.</p>
+<pre>&lt;plugin&gt;
+ &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
+ &lt;artifactId&gt;build-helper-maven-plugin&lt;/artifactId&gt;
+ &lt;version&gt;1.4&lt;/version&gt;
+ &lt;executions&gt;
+   &lt;execution&gt;
+     &lt;id&gt;add-wsdl-source&lt;/id&gt;
+   &lt;phase&gt;generate-sources&lt;/phase&gt;
+   &lt;goals&gt;
+     &lt;goal&gt;add-source&lt;/goal&gt;
+   &lt;/goals&gt;
+   &lt;configuration&gt;
+     &lt;sources&gt;
+       &lt;source&gt;${basedir}/src-generated/src&lt;/source&gt;
+     &lt;/sources&gt;
+   &lt;/configuration&gt;
+ &lt;/execution&gt;
+ &lt;execution&gt;
+   &lt;id&gt;add-wsdl-test-source&lt;/id&gt;
+   &lt;phase&gt;generate-sources&lt;/phase&gt;
+   &lt;goals&gt;
+     &lt;goal&gt;add-test-source&lt;/goal&gt;
+   &lt;/goals&gt;
+   &lt;configuration&gt;
+     &lt;sources&gt;
+       &lt;source&gt;${basedir}/src-generated/test&lt;/source&gt;
+     &lt;/sources&gt;
+   &lt;/configuration&gt;
+ &lt;/execution&gt;
+ &lt;execution&gt;
+   &lt;id&gt;add-wsdl-resource&lt;/id&gt;
+   &lt;phase&gt;generate-sources&lt;/phase&gt;
+   &lt;goals&gt;
+     &lt;goal&gt;add-resource&lt;/goal&gt;
+   &lt;/goals&gt;
+   &lt;configuration&gt; 
+     &lt;resources&gt;
+       &lt;resource&gt;
+         &lt;directory&gt;${basedir}/src-generated/resources&lt;/directory&gt;
+         &lt;targetPath&gt;target/classes&lt;/targetPath&gt;
+       &lt;/resource&gt;
+     &lt;/resources&gt;
+   &lt;/configuration&gt;
+ &lt;/execution&gt;
+ &lt;/executions&gt;
+ &lt;/plugin&gt;</pre>

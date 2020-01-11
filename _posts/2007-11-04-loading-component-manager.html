@@ -1,0 +1,24 @@
+---
+layout: post
+title: Loading Component Manager.
+date: 2007-11-04 00:21:27.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Thought
+tags: []
+meta: {}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2007/11/04/loading-component-manager/"
+---
+<p>I've been having a look at the loadup of the component manager. At the  moment we do it as a side effect of the first webapp to load. This is  Ok, but it doesnt really tie into the life cycle of the container and  feels wrong. We have seen some problems in the past due to startup  order, which the Component Manager should not be subject to.</p>
+<p>So https://source.sakaiproject.org/contrib/tfd/trunk/lifecycleloader is  a loader that brings the component manager up by hooking into the  lifecycle of the tomcat container. This makes it possible to get grater  control over the classloader structure and better isolation. It just  needs a  single line in server.xml to register the listener.</p>
+<p>It also opens more possibilities to have a non static component manager  registration as we now have full access to JMX and JNDI within the  server, so we could lookup the component manager from the container.</p>

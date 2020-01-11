@@ -1,0 +1,35 @@
+---
+layout: post
+title: Sling Runtime Logging Config
+date: 2009-11-10 18:10:01.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '3991311'
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1288785577";}
+  reddit: a:2:{s:5:"count";s:1:"0";s:4:"time";s:10:"1288785605";}
+  _oembed_7e5827b96973fad03beb9c654a2959ff: "{{unknown}}"
+  _oembed_cf93efbf03f68d61f81e8f85229d05d4: "{{unknown}}"
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2009/11/10/sling-runtime-logging-config/"
+---
+<p>One of the most annoying things about bug hunting in open source, is that you can see that the developer left log.debug( statements for you in the code but you have to shutdown, reconfigure logging and restart. In Apache Sling this isnt the case. According to the documentation at <a href="http://sling.apache.org/site/logging.html">http://sling.apache.org/site/logging.html</a> you can configure logging at <strong>runtime</strong>. AND you can configure it on a class by class basis. Here are some screenshots of how.</p>
+<p>Go to the admin console, select the configuration tab.</p>
+<p><img class="alignnone size-full wp-image-284" title="Picture 6" src="{{ site.baseurl }}/assets/picture-6.png" alt="Picture 6" width="510" height="151" /></p>
+<p>Select from the Configuration Factories drop down the logging.config Factory,</p>
+<p><img class="alignnone size-medium wp-image-283" title="Picture 7" src="{{ site.baseurl }}/assets/picture-7.png?w=300" alt="Picture 7" width="300" height="127" /></p>
+<p>Set the properties including the package or class that you want this logging config to apply to, and save.</p>
+<p><img class="alignnone size-full wp-image-282" title="Picture 8" src="{{ site.baseurl }}/assets/picture-8.png" alt="Picture 8" width="510" height="268" /></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>As I mentioned, you can do all of this on a running instance, no need to shutdown.</p>

@@ -1,0 +1,38 @@
+---
+layout: post
+title: Linear Classloaders and OSGi
+date: 2008-09-04 23:31:31.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Thought
+tags:
+- cayenne
+- hibernate
+- osgi
+meta:
+  _edit_last: '1'
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1422170288;}
+  _oembed_7f4ea8594ce762cb84800433ad79a690: "{{unknown}}"
+  _oembed_3aadb0e0e2d3bf597f11504cc4358df2: "{{unknown}}"
+  _oembed_c7c8dcdefbd13e510fc8821687902c80: "{{unknown}}"
+  _oembed_a0ab0803e82328923dfa8c9754a3027b: "{{unknown}}"
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2008/09/04/linear-classloaders-and-osgi/"
+---
+<p>OSGi does not remove all classloader problems as can be seen from <a href="http://www.osgi.org/blog/2008/07/qvo-vadimus.html" target="_blank">http://www.osgi.org/blog/2008/07/qvo-vadimus.html</a> and <a href="http://www.osgi.org/blog/2007/06/osgi-and-hibernate.html" target="_blank">http://www.osgi.org/blog/2007/06/osgi-and-hibernate.html</a> where the Peter Kriens notes that </p>
+<p style="padding-left:30px;"><em>"Hibernate manipulates the classpath, and programs like that usually do not work well together with OSGi based systems. The reason is that in many systems the class visibility between modules is more or less unrestricted. In OSGi frameworks, the classpath is well defined and restricted. This gives us a lot of good features but it also gives us pain when we want to use a library that has aspirations to become a classloader when it grows up."<br />
+</em></p>
+<div>It turns out that some JPA solutions are OSGi friendly, others are not. It all depends on what is done to load the persistence.xml and the related classes, and then the proxy classes cause further classloader problems.</div>
+<div></div>
+<div>I guess, since the author is Peter is OSGi Director of Technology, he knows what he is talking about.</div>
+<div></div>
+<div>Apparently EclipseLink was written to be OSGi friendly, and non-proxy, classloader clever ORM solutions also work, Cayenne falls into this group, and reportedly works OK in side OSGi, although I don't know if that's v2 or v3 </div>

@@ -1,0 +1,23 @@
+---
+layout: post
+title: Maven 2 Version
+date: 2007-03-29 17:59:02.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Thought
+tags: []
+meta: {}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2007/03/29/maven-2-version/"
+---
+<p>You may have noticed that the maven 2 build has M2 all over it. This was  to avoid conflicts with the maven 1 builds, but we need to be able to  build everything to particular versions. This is not quite as easy as  with maven 1 where project.properties allowed you to build a specific  version.</p>
+<p>In Maven 2 the mechanism appears to be the settings.xml file, where  properties can be defined. At some point I need to change all the M2  references into ${sakai.build} references and provide a settings.xml  file to define what sakai.build is, alternatively a simple mvn command  could be used, eg mvn -Dsakai.build=2.4. The drawback with thins is that  its not bound to  SVN so when you check out the 2.4 tag you have to know  howto build. Perhaps a build.sh and build.bat would make sense. However  we do it we need to be able to build different version bound to SVN  without editing the entire pom tree...... but then on release a find sed  combination wouldn't be so bad ? (runs for cover)</p>

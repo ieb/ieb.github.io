@@ -1,0 +1,36 @@
+---
+layout: post
+title: Solr Search Bundle 1.2 released
+date: 2011-11-18 02:21:42.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '3991311'
+  _wpas_done_twitter: '1'
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1404630780;}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2011/11/18/solr-search-bundle-1-2-released/"
+---
+<p>The Solr Search v1.2 bundle developed for Nakamura has been released. This is not to be confused with Apache Solr 4. The bundle wraps a snapshot version of Apache Solr 4 at revision 1162474 and exposes a number of OSGi components that allow s SolrJ client to interact with the Solr server.</p>
+<p>This release fixes a number of bugs related to concurrency and and the indexing operation identified by moving from a single threaded indexing operation to a muli threaded indexing operation. These bugs were introduced in the previous release. These were introduced by sharing a StreamingSorUpdateServer between multiple threads. Although the class is thread safe and after about June 2011 it does not hang, it does contain an internal memory based queue that asyncronously sends updates to a remote server. I should state, and you guessed it, that this only impacts situations where the Solr server being updated is not in the same JVM. The problem is that should any of the updates fail, no communication of that fact propagates back to the thread that performed the update operation. In the case of the Solr bundle we attempt to make the indexing queue reliable with a transactional, persistent queue. However, since we dont know if the update operation failed, we have no chance of working out what to do with the batch of updates being processed. This release fixes those issues. It also fixes a number of clustering and failover issues discovered at Charles Sturt University which I will leave for a follow up post.</p>
+<p>Other improvements are listed with the issues fixed against this version, link below. As always, thanks goes to everyone who contributed and helped to get this release out.</p>
+<pre>Issues Fixed: https://github.com/ieb/solr/issues?sort=created&amp;direction=desc&amp;state=closed&amp;page=1&amp;milestone=3
+Release Tag: https://github.com/ieb/solr/tree/org.sakaiproject.nakamura.solr-1.2</pre>
+<p>Downloads are available from the release tag.</p>
+<p>To Use from a maven2 project</p>
+<pre> 
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.sakaiproject.nakamura&lt;/groupId&gt;
+        &lt;artifactId&gt;org.sakaiproject.nakamura.solr&lt;/artifactId&gt;
+        &lt;version&gt;1.2&lt;/version&gt;
+    &lt;/dependency&gt;</pre>

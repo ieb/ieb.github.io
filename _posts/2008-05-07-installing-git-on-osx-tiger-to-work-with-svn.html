@@ -1,0 +1,27 @@
+---
+layout: post
+title: Installing git on OSX Tiger to work with SVN.
+date: 2008-05-07 22:19:03.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '1'
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2008/05/07/installing-git-on-osx-tiger-to-work-with-svn/"
+---
+<p>
+First off, no dmg available for Tiger, so you need to build from source.</p>
+<p>
+Building Git from source is easy on OSX, just download one of the tarballs from linux.org, configure make install, but getting it to work with SVN is not quite so easy because by default it binds to the OSX perl which may or may not have Alien::SVN</p>
+<p>
+MacPorts appears to work:  sudo port install git-core +svn</p>

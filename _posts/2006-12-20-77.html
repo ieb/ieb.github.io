@@ -1,0 +1,40 @@
+---
+layout: post
+title: ''
+date: 2006-12-20 11:50:07.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta: {}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2006/12/20/77/"
+---
+<p>If you find that you get a invalid  header field with a Maven 2 pacakaged war or jar then you are probably using and old version of the maven-archiver plugin that cant cope with pom descriptions containing line breaks.</p>
+<p>This may be in the war, but it could also be any of the jars (including 3rd party jars) included in the  war.<br />
+There is a simple solution, remove the .m2/repository/org/apache folder and let mvn pull uptodate versions from the remote repositories.</p>
+<p><code>   Dec 18, 2006 8:35:44 PM org.apache.catalina.core.StandardContext<br />
+start   SEVERE: Error in dependencyCheck<br />
+java.io.IOException: invalid header field<br />
+at java.util.jar.Attributes.read(Attributes.java:389)<br />
+at java.util.jar.Manifest.read(Manifest.java:167)<br />
+at java.util.jar.JarInputStream.(JarInputStream.java:66)<br />
+at java.util.jar.JarInputStream.(JarInputStream.java:43)<br />
+at org.apache.catalina.util.ExtensionValidator.getManifest(ExtensionValidator.java:372)<br />
+at org.apache.catalina.util.ExtensionValidator.validateApplication(ExtensionValidator.java:183)<br />
+at org.apache.catalina.core.StandardContext.start(StandardContext.java:4035)<br />
+at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:759)<br />
+at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:739)<br />
+at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:524)<br />
+at org.apache.catalina.startup.HostConfig.deployWAR(HostConfig.java:809)<br />
+at org.apache.catalina.startup.HostConfig.deployWARs(HostConfig.java:698)<br />
+at org.apache.catalina.startup.HostConfig.deployApps(HostConfig.java:472)<br />
+at org.apache.catalina.startup.HostConfig.start(HostConfig.java:1122)  </code></p>

@@ -1,0 +1,35 @@
+---
+layout: post
+title: Xen Virtual Sakai Servers with an NFS Home
+date: 2007-08-28 12:57:14.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta: {}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2007/08/28/xen-virtual-sakai-servers-with-an-nfs-home/"
+---
+<p>The aim is to create A number of Xen virtual servers with as much configuration in place to bring up Sakai, as per the previous posts, I am using an old Sarge box, with a Dom0 Xen installation and a bridged Xen network. Each client will hopefully DHCP its interface up, but I could build clients with fixed  IP's.</p>
+<p>This is a development installation where we trust the users of the Dom0 machine so I am going to sync the users information with Dom0, and NFS mount the Dom0 home directories. To make this work in the in the virtual server it needs the correct modules.</p>
+<p>The virtual servers are built on LVM as LVM partitions, using xen-tools. I tried doing manual builds, but it takes forever to mount configure etc what is all scripted in xen-create-image script.</p>
+<p>So the xen-create-image command populates a 4GB root filesystem with all the pre-requisites for the OS and mounting nfs home directories. I thin run a custom role that appends an NFS mount to the end of /etc/fstab, installs the JDK, maven2 and tomcat from tarballs and does some local configuration of the tomcat installation.</p>
+<p>Since the role script to do all this is part of the xen-tools configuration, all I have to do to create a new virtiual machine for running a Sakai cluster node is to do xen-create-image --hostname sakai1 --memory 1024M --swap 1024M --role sakaisetup</p>
+<p>wait about 3 minutes as Debian Etch is installed and then</p>
+<p>xm create sakai1.cfg</p>
+<p>to boot the new virtual server.</p>
+<p>xm console sakai1</p>
+<p>Gives me a console window</p>
+<p>xm shutdown sakai1</p>
+<p>powers down the virtual machine, and</p>
+<p>xen-delete-image sakai1</p>
+<p>deletes the image from the LVM</p>
+<p>There is a GUI manager, but this is all so simple, why bother...... and there is VMWare..... but Xen doesn't cost, other than time and is available via apt-get.</p>

@@ -1,0 +1,26 @@
+---
+layout: post
+title: Sling and OSGi in Oakland
+date: 2009-11-04 15:40:07.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '3991311'
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1288785584";}
+  reddit: a:2:{s:5:"count";s:1:"0";s:4:"time";s:10:"1288785584";}
+  _wp_old_slug: testing-something
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2009/11/04/sling-and-osgi-in-oakland/"
+---
+<p>Over here in Oaklant there has been a lot of interested in 2 areas. Firstly nosql storage, and secondly OSGi based platforms. The nosql platforms of local interest since anyone thinking of creating a business that will become profitable in social media, has to think about huge numbers of user to have any chance of converting the revenue from page view into real cash. They have to start from a scaling viewpoint. That doesn't mean they have to go out and spend whatever meager funding they just raised on massive hardware, that means that they have to think in a way that scales. Doing this they start in a way that scales for the first 10 users, and then as the number ramp up faster than they can provision systems, or install software they can at least stand some chance of keeping up. Right at the backend, doing this with traditional RDBMS's is complete nonsense. Ok, so you might be able to build a MySQL cluster in multimaster mode to handle X users, but at some point you are going to run out of ability to add more and you wont get to 10X or 100X, and by the way break even was at 1000X. To me thats why nosql, eventual consistency and a parallel architecture where where scale-up is almost 100%. This makes me laugh, back in 1992, having parallelised many scientific codes with what felt like real human benefits, Monte Carlo simulations for brain radiotherapy, early versions of GROWMOS and MNDO, protein folding codes, and algebraic multigrid CFD code used for predicting spread of fires in tube stations, and some military applications, we never saw this level of speedup, perhaps the problems were just not grand challenge enough... and social media is .... but on the serious side, thinking of the app as a massively parallel app from the start, creates opportunities to have all the data already distributed and available for algorithmic discovery from the start. Not surprising the Hadoop sessions were the largest, even if some of analysis was on the dark side of the internet.</p>
+<p>The other strand at ApacheCon that grabbed interest was OSGi. Small components, plugging into standardized containers, loaded at runtime. In academia the grand challenge problems are those of the digital libraries with the responsibility to preserve information for 100s of years. Researchers datasets that may contain the essence of a future discovery. There must be a duty to ensure that this information is stored in such a way as to allow analysis to be performed. We have to think of the storage as a massive parallel machine, the cloud. Then we have to think of the mechanism for enabling future analysis. Using OSGi as the component model, storing data in the cloud open these possibilities up. I've heard Fedora Commons (thats Digital Libraries, not Linux distro) and DSpace are thinking this way. Adopting OSGi as a component model, thinking of cloud storage for the data.</p>

@@ -1,0 +1,42 @@
+---
+layout: post
+title: Sakai CLE ElasticSearch
+date: 2012-10-11 06:50:56.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags:
+- Apache Solr
+- ElasticSearch
+- Lucene
+- Solr
+- Tony Hoare
+meta:
+  _edit_last: '3991311'
+  publicize_reach: a:2:{s:7:"twitter";a:1:{i:77605;i:83;}s:2:"wp";a:1:{i:0;i:8;}}
+  _wpas_done_77605: '1'
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:54083831;b:1;}}
+  _wpas_skip_77605: '1'
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2012/10/11/sakai-cle-elasticsearch/"
+---
+<p><a href="http://ianboston.files.wordpress.com/2012/10/screen-shot-2012-10-11-at-17-48-24.png"><img class="alignright  wp-image-809" title="Screen shot 2012-10-11 at 17.48.24" alt="" src="{{ site.baseurl }}/assets/screen-shot-2012-10-11-at-17-48-24.png?w=278" height="240" width="222" /></a>A long time ago, I wrote a search module for Sakai 2 as CLE was known then. It attempted to make every node in a CLE instance share the load of indexing and searching and make the search aspect of a CLE cluster scale elastically. To some extents it worked, but it had problems. The indexing queue was persisted in a DB table and it was based on a old version of Lucene that didn't have anything as useful as commits. Consequently it could get its segments into a bit of mess at times. The world has moved on in the 5 years since I wrote that code, and two viable alternatives for supporting Search in Sakai CLE have emerged. <a class="zem_slink" title="Apache Solr" href="http://lucene.apache.org/solr/" target="_blank" rel="homepage">Apache Solr</a> and Elastic Search. Both can be run as remote servers or embedded. Both are solid reliable releases. It could be argued that Solr has more support for sophisticated index schema, and it's probably true that Elastic Search is easier to deploy for elastic scaling and real time indexing as that's its default behaviour.</p>
+<p>For those wanting to try Sakai CLE with Apache Solr as the search server then look no further than the work that Adam Marshall has been doing at Oxford University. That allows you to spin up a Solr instance and connect your Sakai CLE instances to it. You will have to do some reasonably sophisticated master slave configuration to make it resilient to failures and don't expect the indexing operations to be real-time. There are plenty of references to the work required to do that in this blog, and arguments why I currently prefer ElasticSearch over Solr.</p>
+<h2>Deployment and reliability</h2>
+<p><a class="zem_slink" title="ElasticSearch" href="http://www.elasticsearch.org" target="_blank" rel="homepage">ElasticSearch</a> comes out the box being real-time, elastic and cloud aware, with built-in AWS EC2 knowledge as well as rack awareness. Its been built to shard, partition and replicate indexes out of the box. The ElasticSearch client as I am finding out is simple to embed into most environments including <a class="zem_slink" title="OSGi" href="http://www.osgi.org" target="_blank" rel="homepage">OSGi</a> and when embedded makes each app server node a part of elastic search cluster. Best of all, for the nervous by nature, is the resilience that comes from spinning up more than 3 instances in the same cluster. In fact, I have been finding it hard to damage elastic search indexes in tests. It's perfectly possible to do all of this with Solr, but the deployer has to work a little harder adding some custom components to support a writeahead log and a Zookeeper instance to manage the cloud.</p>
+<h2>Metadata Indexing</h2>
+<p>Probably the best part of ElasticSearch is the client which is a fully multithreaded client following the same pattern <a href="http://www.usingcsp.com/">Communicating Sequential Processes</a> first described by <a href="http://research.microsoft.com/~thoare/">Tony Hoare</a> and one of the motivators for the <a class="zem_slink" title="Go (programming language)" href="http://golang.org" target="_blank" rel="homepage">Go language</a>. This allows a client for submit suitably light weight indexing requests to the ElasticSearch cluster via an embedded client without needing to think about managing a queue or the latency of indexing. This nice little feature turns the 1000 lines of code I had to write for Sakai CLE  and OAE search into about 20. Initial tests show that indexing can be done within the request loop and because of the true real-time nature ElasticSearch with its write ahead log, results are available about 50ms after the transaction commits. To maintain that latency, I only index metadata via this route. Document indexing takes a different route.</p>
+<h2>Document Indexing</h2>
+<p>I found with the original Sakai 2 search and subsequent Solr based indexing of documents in Sakai OAE that indexing bodies was expensive. In some instances tokenizing office documents could place extreme strain on a JVM heap. For that reason when I did the indexing service in the Django version of OAE I did two things. I offloaded the document body indexing operations to separate processors driven by a queue of events, following the CSP pattern mentioned above, and I made the content store single instance. Where users collaborate, they often upload the same document. With a single instance content store, only a single instance of a document is stored and hence, tokenizing and information extraction is only performed once. This greatly reduces the cost of indexing. The store isn't collision perfect but by performing a hash on the document body as its saved its possible to eliminate most if not all collisions. Certainly SHA1(ing) enough of the body eliminates all collisions.</p>
+<p>So the document indexing processes use the index to locate documents that need to be indexed and then use the single instance content store to eliminate duplicate tokenizing. Using this approach in the Sparse Content Map content system which is already single instance has a dramatic impact on IO. Sakai CLE Content Hosting Service is not single instance at present but could be adjusted to be so once hashes are known. It would be nice to fix that aspect of CHS at some point.</p>
+<div class="mceTemp"></div>
+<h2>Current state</h2>
+<p>I am still working on this code, and this post is part notes, part notification should I get distracted. My testbed is the Sparse Content Map content system only because it builds in 20s, starts in 5, has full integration test coverage and compliant webdav support thanks to Milton. There is currently nothing in the code base that prevents it using Spring or a Webapp container as opposed to OSGi, and the coupling is loose being event driven. The best part is the result should scale as far as ES can scale which is probably a lot larger than any CLE instance in production.</p>

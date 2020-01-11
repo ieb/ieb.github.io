@@ -1,0 +1,44 @@
+---
+layout: post
+title: Offline Maven 2
+date: 2008-02-22 20:44:51.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta: {}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2008/02/22/offline-maven-2/"
+---
+<p>
+Ever tried to run maven 2 with no network and Snapshots, after midnight.... its hard because it likes to check for updates of snapshots. The following in ~/.m2/settings.xml might help.</p>
+<p><code class="prettyprint"></p>
+<pre>
+&lt;?xml version=&quot;1.0&quot;?&gt;
+  &lt;settings&gt;
+   &lt;profiles&gt;
+     &lt;profile&gt;
+       &lt;repositories&gt;
+         &lt;repository&gt;
+           &lt;id&gt;local-repository&lt;/id&gt;
+           &lt;url&gt;file:////Users/ieb/.m2/repository&lt;/url&gt;
+         &lt;/repository&gt;
+       &lt;/repositories&gt;
+       &lt;id&gt;local-offline&lt;/id&gt;
+     &lt;/profile&gt;
+   &lt;/profiles&gt;
+
+   &lt;activeProfiles&gt;
+     &lt;activeProfile&gt;local-offline&lt;/activeProfile&gt;
+   &lt;/activeProfiles&gt;
+&lt;/settings&gt;
+</pre>
+<p></code></p>

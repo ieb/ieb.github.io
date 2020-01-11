@@ -1,0 +1,39 @@
+---
+layout: post
+title: Following a bunch of forks.
+date: 2009-04-22 17:37:39.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '3991311'
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1288785637";}
+  reddit: a:2:{s:5:"count";s:1:"0";s:4:"time";s:10:"1288785637";}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2009/04/22/following-a-bunch-of-forks/"
+---
+<p>Can start to be a pain, this fetches things a bit faster for review.</p>
+<pre>x43543-2:osgikernel ieb$ git branch -a
+* master
+  carl/master
+  codders/master
+  danatcaret/master
+  daniel/master
+  holdorph/master
+  jholtzman/master
+  origin/master
+  stuartf/integration
+  stuartf/master
+x43543-2:osgikernel ieb$ for i in `git branch -a | grep '/master' | grep -v origin | cut -f1 -d'/'`; do git fetch $i; done
+x43543-2:osgikernel ieb$ gitk -all</pre>
+<p>Which looks like this:</p>
+<p>[caption id="attachment_243" align="alignnone" width="510" caption="Tracking branches in GitK"]<img class="size-full wp-image-243" title="Gitk branches" src="{{ site.baseurl }}/assets/picture-2.png" alt="Tracking branches in GitK" width="510" height="387" />[/caption]</p>

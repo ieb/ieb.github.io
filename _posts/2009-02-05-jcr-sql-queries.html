@@ -1,0 +1,29 @@
+---
+layout: post
+title: JCR SQL Queries
+date: 2009-02-05 18:26:43.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Thought
+tags: []
+meta:
+  _edit_last: '1'
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1344346695;}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2009/02/05/jcr-sql-queries/"
+---
+<p>Care needs to be taken</p>
+<pre>SELECT *  FROM nt:base  WHERE jcr:path LIKE '/userenv/%'
+</pre>
+<p>works, but</p>
+<pre>SELECT *  FROM nt:base  WHERE jcr:path LIKE '/userenv%'</pre>
+<p>does not.</p>

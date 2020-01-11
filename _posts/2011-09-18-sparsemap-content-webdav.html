@@ -1,0 +1,27 @@
+---
+layout: post
+title: Sparsemap Content WebDav
+date: 2011-09-18 03:47:25.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '3991311'
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1505023891;}
+  _wpas_done_twitter: '1'
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2011/09/18/sparsemap-content-webdav/"
+---
+<p>I have always felt that a good test of a content system is to give it to a badly behaved client. WebDav clients tend to be badly behaved and often make unreasonable requests of a http server that was not expecting to be a webdav server. OSX Finder is a good example. It often makes 100s of PROPFIND requests just because the user looked at a Finder window, and dragging and dropping a folder onto a webdav volume in Finder is going to generate a storm of requests, some reading some writing.</p>
+<p>Rather than attempting to write my own Webdav protocol library I have been using the Milton WebDav library, developed by <a href="http://www.bradmcevoy.com/blogs/index.html">Brad McEvoy</a>. Although there is quite a bit of Spring Framework in the code base, none of it is an absolute requirements so it was easy to integrate into a simple, light OSGi container. I used Apache Felix via a modified version of the Apache Sling Launchpad to create a standalone executable jar containing Jetty and about 10 other components. The memory footprint at startup of is about 4MB, and startup of the full OSGi container is less that 5s. Adding in Milton Support for webdav and a DAV level 2 implementation of the SPI classes to interface between Milton and Sparse Content Map brings that upto about 7MB but barely impacts the startup time. To get DAV Level 1 support Sparse Map Content already had all the features required. To get level 2 support I added a LockManager to Sparse Content map, storing the locks as maps within the content system but keeping the locks independent of the content system itself to allow DAV clients to pre-lock content trees before they exist. The net result is a small light weight and reasonably fast dav server, running in an OSGi container. It runs happily under load in less that 25MB of memory and feels almost like a native file system when used within Finder. Finder naturally hammers the server with thousands of PROPFIND operations and loads of OSX specific file creates but both Sparse Map Content and the protocol handling provided by Milton hardly appear to notice. The trace below is from JConsole while uploading about 4GB in about 1000 files. SparseMap is running using wide column indexes under Derby, so I suspect most of the retained 14MB will be Derby caches. The upload finishes slightly after 13:12. End to end, adding WebDav to Sparse Map Content took a few hours mainly due to excellent protocol support and clean simple code in Milton coupled with the almost instant response from Brad on the Milton Users list. All the code for this can be found in the extensions sub folder of the sparsemap git repository, and will be in the 1.1 release in a few days time.</p>
+<p><a href="http://ianboston.files.wordpress.com/2011/09/screen-shot-2011-09-18-at-13-18-29.png"><img class="alignnone size-full wp-image-483" title="Screen shot 2011-09-18 at 13.18.29" src="{{ site.baseurl }}/assets/screen-shot-2011-09-18-at-13-18-29.png" alt="" width="510" height="225" /></a></p>
+<p>&nbsp;</p>

@@ -1,0 +1,23 @@
+---
+layout: post
+title: Caching
+date: 2007-08-17 20:25:33.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta: {}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2007/08/17/caching/"
+---
+<p>Its a while since I have had a chance to look at caching. Most of us reach for HashMap or something more concurrent, but there are plenty of cache implementations and the use cases are relatively well understood. Put an object, get it back, and clear it. JCACHE JSR-109 never really did appear to produce a standard, perhapse it was one of those standards that was just too close to the Map concept to be interesting for those involved, however several of the cache providers look like they support it. But in Sakai we have already been using a cache, for some time. We have a sophisticated internal cache in the form of the memory service. This works in a cluster and serveral years back was state of the art. Since then the Concurrent work has deliverd really sensible concurrent hash maps, Commons collections has LRU hash maps and collections, and the higher level caching providers have moved on.</p>
+<p>When I looked a Jackrabbit and its cluster implementation I was struck by how its Cache was both transaction aware via a XA/JTA binding and how it propagated those transactions over the cluster. Others that appear to adress these issues include OSCache and JBossTree. There are plenty of commercial offerings in this area that we cant look at, and some that just dont have a friendly license. Today I went back to look at ehcache which we have scattered all over sakai. I noticed that it also has moved on since version 1.1. Since 1.2 (current version is 1.3) is supports cluster wide caches with replication either by copy or invildation over the whole cluster. The Architecture looks pluggable.</p>
+<p>All of this is all very interesting, but unless we all use the same central cache or memory service, there is no chance that Sakai's memory footprint will be actively managed in production, and its going to be an uphill struggle transferring the load away from the database and into the app servers without impacting the speedup. There is no point in having a wonderfully powerful, parallel, scalable application if the algorithm is 10  times slower than the serial version.</p>

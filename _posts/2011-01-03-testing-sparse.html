@@ -1,0 +1,28 @@
+---
+layout: post
+title: Testing Sparse
+date: 2011-01-03 11:26:55.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '3991311'
+  _wp_old_slug: testesting-sparse
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1454863197;}
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1300788802";}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2011/01/03/testing-sparse/"
+---
+<p>The depressing thing about profiling and load testing is the more you do it, the more problem you discover. In Nakamura I have now ported the content pool (amorphous pool of content identified by ID rather than path) from Jackrabbit to a Sparse Content Map store that I mentioned some weeks back. Load testing shows that the only concurrency issues are related to the Derby or MySQL JDBC drivers, and I am certain that I will need to jump through some hoops to minimise the sequential nature of RDBMS's on write. From earlier tests thats not going to be the case for the Cassandra backend which should be fully concurrent on write. Load testing also shows memory leaks. Initially this was the typical prepared statements, being opened in loop, leaking without closing. Interesting Derby is immune to this behaviour and recognises duplicates so no leaks, but MySQL leaks badly, and always creates an internal result set implementation when a prepared statement is created. That was easy to fix, thread local hash map to ensure only one prepared statement of each sharded type is opened, and then all are closed after the end of the update operation.</p>
+<p>Next new memory leak that has appeared is in the Jackrabbit Session. I am not certain if its new, or old just exposed by higher load. Sling has a PluggableDefaultAccessManager that is used by Jackrabbit to allow AccessManagers to the repository to be plugged in. Unfortunately the Jackrabbit configuration model is based on bean utils type injection, and the AccessManagers are bound to  JCR Sessions which are free floating objects. In order to plug AccessManagers in via OSGi, Sling has to have a service tracker to keep track of the AccessManagerFactories, which in turn must track all the resources created to ensure cleanup. Sadly the OSGi singleton service model doesn't quite fit with the Jackrabbit free floating Session model, resulting in the AccessManagerFactory maintaining references to the Sessions, which dont always get cleaned. Hey presto, a leak. After about 8h of uploading content to the pool, which still uses JR for login/logout operations, I have 20K JR Sessions that the GC processes cant clean, and the JVM is getting swamped by GC cycles to almost no useful work.</p>
+<p>Switching to the DefaultAccessManager that comes with JR we lose the ability to plug anything in via OSGi, but the leak goes, only to expose the real underlying cause. In our Q1 release we had so many problems with concurrency in JR Sessions that all lead back to 1 SystemSession per workspace managing security. On one hand this one session is good, since all the ACL resolution is cached for all sessions making ACL resolution fast, except, JCR sessions are non thread safe and so are heavily synchronized to prevent total JCR workspace meltdown in the event of concurrent access. Now if you use of JR or Sling is read mostly per workspace (or read write with a handful of users) then there is no problem. Even if all your ACLs fit in memory, you are probably going to avoid concurrent access of the single SystemSession supporting ACL resolution. Unfortunately for us, our use of JR is mostly read-write and the number ACLs we have, partially due to the content pool mentioned above, are orders of magnitude greater that what would fit in memory and avoid the Singleton SystemSession. So in Q1 we modified JR to bind SystemSessions to threads for as long as they were needed using concurrent finaliser queues to release resources correctly. That works. It does increase the memory footprint, but does avoid LRUMap contention when the SystemSession get populated with a universe of ACLs. Unfortunately under the load we can now put on the system it also causes a Session leak in the AccessManagerFactory which is a singleton. I really should go and fix that, but just at the moment I have consumed all the spare time tracking the problem down and so the simple solution is to replace it with the DefaultAccessManager from Jackrabbit, drop pluggability via OSGi and say good by to the leaks, and hello to the finalizer closing SystemSessions. (also needs to be fixed)</p>
+<p>On a more positive note, the Sparse Content Map was intended to be lightweight so that it would pass through GC cycles with minimal impact. Compared to JR sessions, the SparseSession has a shallow size of 80 bytes per session and a deep retained size of 167 bytes per session. JR XASessionImpls have a shallow size of 232 bytes and a retained size of 39K, so at least the "lite" in the Classname is somewhere close to reality. Like the JR Session traffic to the RDBMS is mostly update with a central shared concurrent cache eliminating most reads. Unlike JR the write and read operations are 100% concurrent with no synchronization.</p>

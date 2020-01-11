@@ -1,0 +1,27 @@
+---
+layout: post
+title: YouTube Snippets
+date: 2010-11-03 16:37:33.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '3991311'
+  _wp_old_slug: ''
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1300451162";}
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1400795958;}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2010/11/03/youtube-snippets/"
+---
+<p>One of the perks of being a member of University of Cambridge is you can (are actively encouraged) to attend Lectures, in any department, on any subject. I think I am right in saying 99% are open to any member of the University. Every now and again the Computer Labs has a speaker worth listening to, Oliver Heckmann, Director of Engineering, Google Zurich and his talk "A Look Into Youtube - The World's Largest Video Site" was one of those especially seeing as a few hours earlier Turkey reimposed their ban on YouTube for what they claimed was unsuitable content, identified by Dr Heckmann's content ID system. He was relaxed, unflustered by the robust stance Google Inc's chief council was taking, reported minutes before by Reuters, to paraphrase, probably incorrectly,  "..... censorship by any one country is an attack on US free trade... ", non US readers might be wondering about Global free trade at this point.</p>
+<p>Aside from the relaxed state of mind and the non technical war of words raging over the North Atlantic, there were so some interesting things, that I believe are public, in fact I think the whole talk was public.  YouTube is a Python app, that still uses Apache Httpd and a sharded read mostly MySQL backend for metadata and web content. The main reason behind this was speed of implementation, which having done a prototype content system in Python on Cassandra, I can believe.  Its heaviest service is the thumbnail service which has 20x the requests of other services and in the early days (cough 2005 I think) some muppet put all the thumbnails on disk as individual files, soon overwhelming the inodes available on the filesystem. The talk even mentioned ".... in one folder ...." but I don't think I believe that, making machine recovery take many hours ( I do believe that). That surprised me, since even the backups we do which are inode based overwhelm the OS and tools like rsync as we found out before 2005. So all of thats in BigTable now, but I question why the thumbnails are not embedded in a CSS files and streamed out as a slower changing set to cover the extremely high rate pages. That would be a 20x saving in that area. Perhaps they are, the talk was thinner on detail the closer to today it became. Video content is all streamed over HTTP, from lighttpd which uses a more event based structure than Apache HTTPD, although I think Apache HTTPD may be changing. Why lighttpd ? Because with long lived httpd connections streaming content, a few threads can service the transport of bytes to sockets without the need for lots of sophistication or the need to tie threads down to sockets. With that approach I will guess that the OS is tuned with more space allocated to socket maintenance balancing the number of sockets to 1 thread per core shipping data out over the network cards.</p>
+<p>The thought provoking part of the talk was the approach to copyright management, the reassuring part was, if what was presented isn't a million miles from today, there isn't a magical world where anything is possible behind the Google IPR wall, just bright engineers finding solutions to problems that they encounter in an environment that makes that task a little easier. The last question from the audience on how Google pays corporate taxes to host countries, made me smile. Dr Heckmann wisely denied all knowledge of that part of the business.</p>

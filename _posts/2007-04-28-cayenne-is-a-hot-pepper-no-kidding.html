@@ -1,0 +1,30 @@
+---
+layout: post
+title: Cayenne is a hot pepper, no kidding.
+date: 2007-04-28 14:30:19.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _oembed_1a2239a2246446925906421d50e77693: "{{unknown}}"
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2007/04/28/cayenne-is-a-hot-pepper-no-kidding/"
+---
+<p>So I was getting fed up the the datamodel I am working with, lots of many to many mapping tables, often with a several tables between the real entities. So I looked up flattening with Cayenne.</p>
+<p>http://cayenne.apache.org/doc20/flattened-relationships.html<code></p>
+<p>Which looks rather simple, and comming form a Hibernate world with stes one-to-many many-to-many reverse joins there to confuse.</p>
+<p>This aspect of Cayene is a little confusing to someone used to complexity. If you define the Database relationships in the mapping file, then you can tell Cayenne the path between the Entities in terms of the Database mappings.</p>
+<p>Thats it.</p>
+<p>It does the rest. I have 2 distant entites, with 4 mapping tables between them, 5 hops, and from one Class I can do  a getRemoteEntityList(); Cayenne converts that into a multi table join acording to the its was conigured with in the mappings and you get the list in one sql statement.</p>
+<p>This isnt too far off what we tend to do with hand optimized SQL.</p>
+<p>The XML specification of this is quite easy to undertand, just define the path a comma seperated list of relationships, but the GUI mapper is even easier as at every step of navigation, it know what relationships are available and gives you the options to where to go next. If there is only one path its completely automatic, if there is a decision to be made its up to you.</p>
+<p>This also works for updates and inserts (I am told), however if there is more than one mapping table, the relationship is read only. If there is one, it will perform all the operations on the intermediate table.</code></p>

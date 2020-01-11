@@ -1,0 +1,53 @@
+---
+layout: post
+title: Running specific Maven Test with JVM Args
+date: 2007-09-21 10:08:41.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags:
+- Apache Maven
+- hibernate
+- Surefire
+- Unit testing
+meta:
+  _edit_last: '3991311'
+  _wpas_skip_77605: '1'
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2007/09/21/running-specific-maven-test-with-jvm-args/"
+---
+<p>I have some long running tests in search, but I wouldnt want anyone to run them as part of the normal build. The tests dont have the word Test in the classname which prevents them from running, but they can be invoked on the command line with -Dtest=<em>classname</em></p>
+<pre class="prettyprint">mvn -Dtest=SearchSoak test</pre>
+<p>Also I have found that its necessary sometimes to add jvm args to the unit test, reconfiguring the Surefire plugin makes this possible, in the pom</p>
+<pre class="prettyprint">...
+  &lt;properties&gt;
+    &lt;deploy.target/&gt;
+    &lt;maven.test.jvmargs&gt; &lt;/maven.test.jvmargs&gt;
+  &lt;/properties&gt;
+...
+&lt;build&gt;
+...
+ &lt;plugins&gt;
+      &lt;plugin&gt;
+        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+        &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;
+        &lt;configuration&gt;
+          &lt;forkMode&gt;pertest&lt;/forkMode&gt;
+          &lt;argLine&gt;${maven.test.jvmargs}&lt;/argLine&gt;
+        &lt;/configuration&gt;
+      &lt;/plugin&gt;
+    &lt;/plugins&gt;
+...
+&lt;/build&gt;</pre>
+<p>And then to run with a heap dump and YourKit connection</p>
+<pre class="prettyprint">export DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH:/Applications/YourKit Java Profiler 6.0.16.app/bin/mac"mvn -Dtest=SearchSoak \
+   -Dmaven.test.jvmargs='-XX:+HeapDumpOnOutOfMemoryError -agentlib:yjpagent' \
+   test</pre>

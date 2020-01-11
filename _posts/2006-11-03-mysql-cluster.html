@@ -1,0 +1,28 @@
+---
+layout: post
+title: MySQL Cluster
+date: 2006-11-03 19:49:13.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Thought
+tags: []
+meta:
+  _oembed_8fa88eee4afe86f8b9ec49a73346999a: "{{unknown}}"
+  _oembed_fb275d2755b56b80de3be0f977cce2fb: "{{unknown}}"
+  _oembed_3556de5ecd770762fce29325e8ff16bf: "{{unknown}}"
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2006/11/03/mysql-cluster/"
+---
+<p>We have been having fun with a mysql cluster,</p>
+<p>go the Linux-HA bit up without to many real problems and the Apache  failover works fine. But clustering MySQL is not that easy. Master/Slave  replication works and will failover, but because of the log offsets is  quite hard work getting it to fail back correctly. It certainly cant do  the merry ping pong that you can do with Apache.</p>
+<p>We could use a SAN, but that would be defeatist. So DRBD, a network  mirror. You might think it was too slow, but having Done some Bonnie++  tests on it it gives close to native speed for reads. And it mirrors to  the pair quite well..... provided you have a 1000BaseT switch, I am  getting sync rates on the network raid of about 80-90MB/s which is Ok.  The nice thing about it is you can put all your software on the network  raid, and so if you are not on the primary node, you wont be able to  startup the software and damage the setup since standby nodes dont have  their discs mounted......so this looks like it gives the failover  benefit of a SAN with normal network hardware and no iSCSI.</p>
+<p>When we did iSCSI tests a year ago, bonnie++ was extremely successful at  destroying filesystems. It appears to be really good at exposing weaknesses.</p>

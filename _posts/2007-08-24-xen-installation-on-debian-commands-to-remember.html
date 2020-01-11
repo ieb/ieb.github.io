@@ -1,0 +1,48 @@
+---
+layout: post
+title: Xen installation on Debian, commands to remember
+date: 2007-08-24 15:32:08.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta: {}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2007/08/24/xen-installation-on-debian-commands-to-remember/"
+---
+<p>Just a note to myself on a Xen installation on Sarge. Having managed to boot the machine into a non responsive state several times, here is how not to do it.</p>
+<p>Apt will get the packages</p>
+<p>If using LVM make certain  of LVM2<br />
+If using udev you will need initramfs installed first to make the lvm2 parts work<br />
+apt-get install lvm2<br />
+apt-get install iproute<br />
+apt-get install bridge-utils<br />
+apt-get install xen-hypervisor-3.0.4-1-i386-pae</p>
+<p>PAE will allow you run in more than 4G</p>
+<p>apt-get install linux-image-2.6.18-5-xen-686<br />
+apt-get install bridge-utils iproute sysfsutils libc6-xen xen-tools<br />
+this might replace apache and a whole bunch of other things</p>
+<p>Fix the bridge setup and xen network</p>
+<p>Reboot.</p>
+<p>Do the rest of the xen setup</p>
+<p>Problems:</p>
+<p>The 2.18 kernels do not provide LVM 1 support in the initrd boot images by default, and the boot will hang with a "waiting for route filesystem" untill busybox appears. This appears only to impact udev kernels with a initramfs built boot image. These boot images are gziped cpio unlike mkinitrd which are real filesystems.<br />
+Solution: Upgrade to LVM2 and do an update-initramfs<br />
+on the kernel and then check that the initrd image has the correct contents.</p>
+<p>You should see a lvm2 script in local-top and vgchange in /sbin, if not check the initramfs-tools areas (/etc/initramfs-tools and /usr/share/initramfs-tools) to make certain that the lvm2 script is there, then check for an copy_exec in the function hooks script in /usr/share....</p>
+<p>To unpack a initramfs image do</p>
+<p>mkdir unpack<br />
+cd unpack<br />
+gunzip -c -9 /boot/test-initrd.img-2.6.18-1-686 |     cpio -i -d -H newc --no-absolute-filenames<br />
+GotYas:</p>
+<p>If you boot up and bring Xend up without specifying routing parameters and ip addresses for the box, you will end up with no addressable IP on the new physical ethernet device. So if {network-setup network-bridge} is in the xend-config.sxp, peth0 will hijack eth0 and expose no IP address and not respond to ARP. Fine if your on console, not so good when you are 20 miles away with no BIOS access.</p>
+<p>Solution:</p>
+<p>Fix the bridging setup before you reboot, or have a 2nd Ethernet interface to break with impunity.</p>

@@ -1,0 +1,42 @@
+---
+layout: post
+title: Given enough Rope
+date: 2010-10-31 18:32:51.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '3991311'
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1300825243";}
+  _wp_old_slug: ''
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1380831015;}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2010/10/31/given-enough-rope/"
+---
+<p>A bit of background. We have been experiencing bad performance for certain searches in Jackrabbit using Lucene. I always knew that sorting on terms not in the Jackrabbit Lucene index was a bad thing, but never looked much further than that until now.</p>
+<p>The query that was problematic is</p>
+<pre>//*[@sling:resourceType='sakai/user-home'] order by  public/authprofile/basic/elements/lastName/@value</pre>
+<p>ie find all nodes of sling:resourceType = sakai/home and sort the result by a child node. On small sets of searches this appears reasonable, what happens when the numbers scale up, and what happens to alternative queries. Eg no sorting or sorting on a property</p>
+<pre>//*[@sling:resourceType='sakai/user-home']
+</pre>
+<p>of the target node.</p>
+<pre>//*[@sling:resourceType='sakai/user-home'] order by @lastName</pre>
+<p>So I loaded an instance with upto 6K user-home nodes, and then loaded with 6K non user-home nodes and did some experiments, graph below.</p>
+<p><a href="http://ianboston.files.wordpress.com/2010/10/searchanalysis1.png"><img class="alignnone size-full wp-image-378" title="SearchAnalysis1" src="{{ site.baseurl }}/assets/searchanalysis1.png" alt="" width="510" height="721" /></a></p>
+<p><a href="http://ianboston.files.wordpress.com/2010/10/searchanalysis2.png"><img class="alignnone size-full wp-image-379" title="SearchAnalysis2" src="{{ site.baseurl }}/assets/searchanalysis2.png" alt="" width="510" height="721" /></a></p>
+<p><a href="http://ianboston.files.wordpress.com/2010/10/searchanalysis3.png"><img class="alignnone size-full wp-image-380" title="SearchAnalysis3" src="{{ site.baseurl }}/assets/searchanalysis3.png" alt="" width="510" height="721" /></a></p>
+<p>&nbsp;</p>
+<p>Pretty clear that the search based on child node does not scale at all and is not concurrent. Further investigation reveals that the sort operation has to load the child nodes inside the Lucene scorer direct from the JCR. with ACLs this is about 120K nodes. With &gt; 1K nodes the LRU caches inside Jackrabbit are overloaded and none of the fetches are from cache, which is the underlying cause of the concurrency issue. In JR 2.1.1 the Persistence Manager is synchronized and so loads are sequential in the JVM. 4 threads all have to wait for one another to load the same data from the DB. Why this code was ever sequential I cant quite see, presumably because a non JDBC Persistence manager might need to be synchronized.</p>
+<p>All of that aside, don't even think about doing anything in a Jackrabbit search that references anything not on the target node, at even the smallest scale it wont perform, and don't be fooled by a test on 100 items. Anyone who is using Lucene directly will know thats obvious; one of the dangers of a powerful query abstraction. Give a developer enough rope to hang themselves with, and they will.</p>
+<p>&nbsp;</p>
+<p>The solution in this case, publish the sort order property to the node that will be sorted to get it into the index so its value can be used to sort in a simple Lucene Scorer that doesn't access JCR at all.</p>
+<p>&nbsp;</p>

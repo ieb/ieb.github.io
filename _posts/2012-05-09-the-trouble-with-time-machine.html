@@ -1,0 +1,54 @@
+---
+layout: post
+title: The trouble with Time Machine
+date: 2012-05-09 08:56:14.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags:
+- Apple
+- Time Capsule
+- Time Machine
+meta:
+  _edit_last: '3991311'
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1495238226;}
+  publicize_results: a:1:{s:7:"twitter";a:1:{i:54083831;a:2:{s:7:"user_id";s:5:"_ieb_";s:7:"post_id";s:18:"200147157695725568";}}}
+  _wpas_done_twitter: '1'
+  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";s:1:"0";s:6:"author";s:7:"3991311";s:7:"blog_id";s:7:"6575768";s:9:"mod_stamp";s:19:"2012-05-09
+    08:56:14";}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2012/05/09/the-trouble-with-time-machine/"
+---
+<p>Every now and again <a class="zem_slink" title="Time Machine (Mac OS)" href="http://en.wikipedia.org/wiki/Time_Machine_%28Mac_OS%29" rel="wikipedia" target="_blank">Time Machine</a> will spit out a "Cant perform backup, you must re-create your backup from scratch" or "Cant attach backup".  For anyone who was relying on its rollback-time feature this is a reasonably depressing message and does typify modern operating systems, especially those of the closed source variety. At some point, having spent all the budget on pretty user interfaces, and catered for all use cases the deadline driven environment decides, "Aw stuffit we will just popup a catch all, your stuffed mate dialog box". 99% of users, rant and rave and delete their backup starting again with a sense of injustice. If your reading this and have little or no technical knowledge, thats what you should do now.</p>
+<p>If you get down to bare nuts and bolts you will find that a Time Machine backup is not that disimular to a <a class="zem_slink" title="BackupPC" href="http://en.wikipedia.org/wiki/BackupPC" rel="wikipedia" target="_blank">BackupPC</a> backup of 10 years ago. It makes extensive use of hard links to snapshot the state of the disk. It perform this in folders with thousands of files creating uniformly distributed tree. That all works fine except when it doesn't. Anyone who has used hard links in anger on a file system will know it tends to put the file system under a lot of stress resulting in more filesystem corruptions than normal. File systems are not that transactional so if an operation fails part way through, then the hard links may start to generate orphaned links.</p>
+<p>Now TimeMachine runs fsck_hsf when it attaches a <a class="zem_slink" title="Sparse image" href="http://en.wikipedia.org/wiki/Sparse_image" rel="wikipedia" target="_blank">sparse bundle</a> file system which is the Time Machine backup. Unfortunately it doesn't try that hard to fix any problems it finds and couldn't possibly corrupt its pretty UI by telling the user that it might have a problem with the users cherished backup of life's memories. Not good for marketing, loosing your loyal customers photos when you promised them it wouldn't happen. Fortunately, those messages are logged in /var/log/fsck_hfs.log. If you use Time Machine and are finding the attach stage takes forever. Take a look in there for the words "FILESYSTEM DIRTY". That indicates, that the last time Time Machine tried to attache the drive the file system check was unable to check the file system and correct any errors, and so, it marked it DIRTY. It is possible to correct one of these filesystems, however, with all those hard links the likelyhood is that your filesystem, even if fsck_hfs -dryf /dev/discXs1 does correct the errors and put it into a FILESYTEM CLEAN state, it wont be a usable and valid backup. When your laptop exits you house with a man wearing a stripy jumper and tights over his head, your children (and you) will cry realising that the backup in the cupboard is corrupt.</p>
+<p>What advice can I give you?</p>
+<ol>
+<li>Check your backups regularly</li>
+<li>If you use TimeMachine, open the "console" program, type DIRTY into the search box and if you find that word, go out an buy another backup disk.... quick.</li>
+</ol>
+<p>For those that want to try and recover a Time Machine backup.</p>
+<pre>chflags -R nouchg /Volumes/My\ Time\ Capsule/mylaptop.sparsebundle
+hdiutil attach -nomount -noverify -verbose -noautofsck /Volumes/My\ Time\ Capsule/mylaptop.sparsebundle
+tail -f /var/log/fsck_hfs.log
+# If you see  "The Volume could not be repaired"
+# then you need to run
+fsck_hsf -dryf /dev/rdiskXs2
+# where X was the number of disk listed when you hdutil attached.
+# I can almost guarentee that the disk will not be recoverable and you will see tens of thousands
+# of broken hard link chains. Fixing those will probably corrupt the backup.
+# which is why this is futile.</pre>
+<p>If you are using a <a class="zem_slink" title="Time Capsule (Apple)" href="http://en.wikipedia.org/wiki/Time_Capsule_%28Apple%29" rel="wikipedia" target="_blank">Time Capsule</a>, power cycle it first, connect your machine to it of 1000BaseT and make sure no other machines are accessing it. Don't use Wifi unless you want to grow old and die before the process completes.</p>
+<p>&nbsp;</p>
+<h2>Update</h2>
+<p>Perhaps I am being a little unfair here. The same unreliability could happen with any backup mechanism that is vulnerable to corrupted backups as a result of the user shutting the lid, the computer going to sleep, a power failure. Time Machine and Time Capsules weakness is that its all to easy to disconnect the network hard disk image and once you do that the Time Capsule end has no way of shutting down the back up process in a safe way. Do that enough times (I have found 1 is enough) and the backup is corrupt and unrecoverable and even the HFS+ Journal can't recover.</p>
+<p>I was also a bit unfair on BackupPC, which is initiated from the server and so although it may create nightmare file systems, can leave the backup image in a reasonable state when the server looses sight of the client.</p>
+<p>Time Machine on an attached drive appears more reliable, but a lot less useful.</p>

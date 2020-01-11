@@ -1,0 +1,36 @@
+---
+layout: post
+title: Moving Git patch streams between repos.
+date: 2008-06-10 22:38:25.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Thought
+tags: []
+meta:
+  _edit_last: '1'
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2008/06/10/moving-git-patch-streams-between-repos/"
+---
+<p>
+I have 2 Git repositories mirroring SVN repositories, and I want to use git to replay all the patches I made in one of the repositories to the other. The added complication is one of the SVN repos that I am mirroring uses externals, the other does not. So my source is a single repo, with no externals, and the target has externals. Fortunately I want to make all my changes in one of the modules.</p>
+<p>
+So I can use the patch generations capabilities of git to generate a stream of patches.<br />
+<code>cd sdata; git log .</code> tells me the stream of commits in the subdir.<br />
+Having located the commit I want to start from<br />
+<code>git-format-patch -o patches --relative d649f550a43d8f94cbe91a7c735a4a68cab4ba14 . </code><br />
+generates a number sequence of patch emails in a directory <code>gitrepobase/patches</code>. The <code>--relative</code> is vital since it makes the patch set relative to working directory. Unfortunately there is a bug in the next git command that means you must have the correct path for the patch to work <code>-p4</code> used to strip path elements from a patch in git-am does not work for new files.</p>
+<p>
+Once the patch set is created, I dont need to email it, I can just run the patch set against the target repo from files on disk. <code>git-am -i ../camtools-trunk/patches/*.patch</code> will interactively apply patches to the target repo, asking me for each patch.</p>
+<p>
+Once the patch operation is complete a <code>git svn dcommit</code> commits the changes back to the target svn repo</p>
+<p>
+With a bit of scripting, it should be possible to build a complete patch set with moves and transfer it between detached repos, just as if the modifications where made to the target repo by hand.</p>

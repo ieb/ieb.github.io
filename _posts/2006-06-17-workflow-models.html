@@ -1,0 +1,25 @@
+---
+layout: post
+title: Workflow models
+date: 2006-06-17 00:45:52.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Thought
+tags: []
+meta: {}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2006/06/17/workflow-models/"
+---
+<p>I had a complete and working workflow engine, that had most of the  concepts present in XBPLM. Then I realized that it was entity focused  and not service focused. To make things work really well in Sakai or any  other SOA, they need to minimize the size of the entity model that is  pulled into memory and focus much more on delivering a result. The  workflow engine was teetering on becoming and EJB monster without the  EJB container.</p>
+<p>So I threw it all away,</p>
+<p>Having built a working prototype the next version is always better  understood. With the help of Hibernate, Sychronizer and Spring the new  model and service is all up, in less than 8 hours... and its service  oriented with a better structured design.... what else can I go an delete ?</p>
+<p>One downside to Synchronizer, you have to do a huge amount of  refactoring if you want to target Java 1.5.... but seeing all the type  safety in 1.5 makes you want to move.</p>

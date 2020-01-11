@@ -1,0 +1,33 @@
+---
+layout: post
+title: Modern WebApps
+date: 2012-03-12 02:03:20.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags:
+- Django
+- Python
+- WebSocket
+meta:
+  _edit_last: '3991311'
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1508652906;}
+  publicize_results: a:1:{s:7:"twitter";a:1:{i:54083831;a:2:{s:7:"user_id";s:5:"_ieb_";s:7:"post_id";s:18:"179024762243260416";}}}
+  _wpas_done_twitter: '1'
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2012/03/12/modern-webapps/"
+---
+<p>Modern web apps. like it or not, are going to make use of things like <a class="zem_slink" title="WebSocket" href="http://en.wikipedia.org/wiki/WebSocket" rel="wikipedia" target="_blank">WebSockets</a>. Browser support is already present and UX designers will start requiring that UI implementations get data from the server in real time. Polling is not a viable solution for real deployment since at a network level it will cause the endless transfer of useless data to and from the server. Each request asking every time, "what happened ?" and the server dutifully responding "like I said last time, nothing". Even with minimal response sizes, every request comes with headers that will eat network capacity. Moving away from the polling model will be easy for UI developers working mostly in client and creating tempting UIs for a handfull of users. Those attractive UIs generate demand and soon the handfull of users become hundreds or thousands. In the past we were able to simply scale up the web server, turn keep alives off, distribute static content and tune the hell out of each critical request. As WebSockets become more wide spread, that won't be possible. The problem here is that web servers have been built for the last 10 years on a thread per request model, and many supporting libraries share that assumption. In the polling world that's fine, since the request gets bound to the thread, the response is generated as fast as possible, and the the thread is unbound. Provided the response time is low enough the request throughput of the sever will be maintained high enough to service all requests without exausting the OS's ability to manage threads/processes/open resources.</p>
+<p>Serving a WebSocket request with the same model is a problem. The request is bound to a thread, the response is not generated  as it waits, mid request, pending some external event. Some time later, that event happens and the response is delivered back to the client. The traditional web server environment will have to expect to be able to support as many concurrent requests on your infrastructure as there are users who have a page pointing to your sever on one of the many tabs they have open. If you have 100K users with a browser window open on a page where you have a WebSocket connection, then the hosting infrastructure will need to support 100K in progress requests. If the webserver model is process per request, somehow you have to provide resources to support 100K OS level processes. If its thread per request, then 100K threads. Obviously the only way of supporting this level of idle but connected requests is to use an event processing model. But that creates problems.</p>
+<p>For instance, anyone writing PHP code will know it will probably on only run in process per worker mode as many of the PHP extensions are not thread safe. Java servlets are simular although changes in the Servlet 3 spec have constructs to release the processing thread back to the container, although many applications are still being developed on Servlet 2.4 and 2.5, and most frameworks are not capable of suspending requests. Python using mod_wsgi doesn't have a well defined way of releasing the processing thread back to the server although there is some code originating from Google that uses mod_python to manipulate the connection and release the thread back to Apache Httpd.</p>
+<p>There are new frameworks (eg Node.js) that address this problem and there is a considerable amount of religion surrounding their use. The believers able to show unbelievable performance levels on benchmark test cases and the doubters able to point to unbelievably complex and unfathomable real application code. There are plenty of other approaches to the same problem that avoid spagetti code, but the fundamental message is, that to support WebSockets at the server side an event based processing model has to be used, that is the direct opposite to how web applications have been delivered to date, and regardless of the religion, that creates a problem for deployment.</p>
+<p>Deployment of this type of application demands that WebSocket connections are can be unbound from the thread servicing the request, when it becomes a WebSocket connection. The nasty twist is that every box handling the request needs to be able to do that, including any WebTiers or load balancers, and any HTTP connection can be converted from the Http protocol into the WebSocket protocol during the request. Fortunately, sensible applications will only support WebSocket on known URLs which gives the LB and WebTiers an oppertunity to route, but prior to routing every component in the chain must be using a small number of threads servicing a large number of open and active sockets.</p>
+<p>This doesn't mean that an entire application framework must be thrown away, but it does mean that whatever is handling the WebSocket request, upgrade and eventual connection must be event based. This also doesn't mean that everyone must learn how to read and write spaghetti code in managing every aspect of threading threading, concurrency in communication re-writing every library to be non-blocking and asynchronous. Fortunately there are some extremely capable epoll based containers (including Node.js, other than its insistance to use JS) that can be used either as WebTier proxies or ultimate endpoints. Some of them, such as the Python based Tornado server will frameworks supporting the mod_wsgi standard and hence capable of running Django based applications for the non WebSocket portion. As can be seen from real benchmarks, these servers offer <a href="http://nichol.as/asynchronous-servers-in-python">performance level expected of event based processing</a> and support for <a href="http://nichol.as/benchmark-of-python-web-servers">traditional frameworks with real blocking resource connections</a>.</p>

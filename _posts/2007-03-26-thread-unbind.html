@@ -1,0 +1,23 @@
+---
+layout: post
+title: Thread Unbind
+date: 2007-03-26 10:27:49.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Thought
+tags: []
+meta: {}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2007/03/26/thread-unbind/"
+---
+<p>ThreadLocalManager does not give the application using it any indication  of when the request cycle is over. If it had some unbind mechanism then  objects could be notified. eg If the object being ejected from the  thread local implement ThreadUnbind, its unbind method is called.</p>
+<p>I might have thought this before, it would make it much easier to  release resources.</p>

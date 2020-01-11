@@ -1,0 +1,49 @@
+---
+layout: post
+title: Abstracting Sakai Urls
+date: 2009-06-04 12:07:55.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '3991311'
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1288785632";}
+  reddit: a:2:{s:5:"count";s:1:"0";s:4:"time";s:10:"1288785632";}
+  _oembed_ca81d2311529d7210a0dc5feae9721ee: "{{unknown}}"
+  _oembed_6bc92a238b490fc94552d5b4310f4521: "{{unknown}}"
+  _oembed_352ab52b6c775442ffcf1503edab6456: "{{unknown}}"
+  _oembed_7fc5a12cdceaf6e40c8a416b8a1121ba: "{{unknown}}"
+  _oembed_1b2adee2ed11b817b2d7f25ee192a9b2: "{{unknown}}"
+  _oembed_7aab80bf36e435b4c77b89ea3c9f1e17: "{{unknown}}"
+  _oembed_0e88410e81f5acede1f1573a888f4e1a: "{{unknown}}"
+  _oembed_49d305d5c9b3b6f5f9fa42bcba5eb783: "{{unknown}}"
+  _oembed_e49c99a3e7625f88e66371f9c9c581b3: "{{unknown}}"
+  _oembed_c162c68e0d1d428f97324adae34fc4fa: "{{unknown}}"
+  _oembed_7e11a8f2afcf42f81b86c22e1e24e9d7: "{{unknown}}"
+  _oembed_0ac5a34d3ba03bc647c260d1dac60548: "{{unknown}}"
+  _oembed_249c2eb614385570bd24e3f3abd5bac1: "{{unknown}}"
+  _oembed_54617fe478e823c0eef65b7bf1d485b4: "{{unknown}}"
+  _oembed_2a62165d913d2419739dcb26a7c8fd94: "{{unknown}}"
+  _oembed_400a853ff41f4b945d8d1476f2445ec3: "{{unknown}}"
+  _oembed_7149fb6e929063733d26218f90748497: "{{unknown}}"
+  _oembed_cf63a60ec37d00fe7aac135f4bd72398: "{{unknown}}"
+  _oembed_c704110757c8e26c02d374992310e4c4: "{{unknown}}"
+  _oembed_dee4937c4733bc17e6cd48647784848b: "{{unknown}}"
+  _oembed_440e8480578118d71698457eab101925: "{{unknown}}"
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2009/06/04/abstracting-sakai-urls/"
+---
+<p>For years the Sakai community has suffered with unspeakable URL's. To give educators URL's that they can only communicate in text, and are unable to spread by word of mouth must be a barrier to teaching. As we rewrite Sakai based on Apache Sling I am determined to ensure that a tutor at Cambridge can say, in a busy street, at lunch time to a confused student; "go to camtools quantumwell2008 and look for the lecture notes" with some confidence that the student will enter camtools.cam.ac.uk/quantumwell2008 and find what they need.</p>
+<p>Competition for simple urls generates challenges. A land grab to claim base level urls will create a huge number of unique root URL's. However we might like to impose a content model on the participants, the URL's are their space, and any abstraction purely for technical purposes has to be avoided. Why should I ask the tutor to put his content in /2008/physics/tutorials/group54/week12 which is only marginally better than earlier versions of sakai with an unspeakable /portal/site/edf435-edf-a237-bdc12 or something close.</p>
+<p>To make the URL's of Sakai usable we have to accept in places there will be millions of potential elements at level in URL space. This leaves us with a technical problem. Put even 1000's of items into a folder in JCR and write performance and concurrency suffer. Experiments show that &lt; 1000 child nodes delivers acceptable performance. This is not unique to JCR, as all hierarchical filing systems exhibit performance limitations with numbers of items per folder at some level, if the folder optimization has been used to speed underlying access. I am not advocating patching Jackrabbit to make it capable of storing millions of items in a folder since doing that will certainly expose other problems.</p>
+<p>So we have accepted that we need to support millions of siblings in url space. To achieve this in JCR and maintain scalability we are re-writing the URL space though a filter that hashes the path so that no folder contains more than 255 items. With 4 levels of hashing  the theoretical limit becomes somewhere around 4E9 items, assuming the underlying infrastructure can cope with that many items.</p>
+<p>After a great deal of experimentation and reading of the Sling code base the implementation solution was embarrassingly simple. Write a servlet that rewrites the URL, resolves the real JCR Sling Resource and re-dispatch that resolved resource back into Sling. In all about 20 lines of code. The only hard part was to patch Sling to allow it to bind non-existent URL's to Servlets. (see <a href="http://codereview.appspot.com/67146" target="_blank">http://codereview.appspot.com/67146</a>) So we now have a mechanism were we can designate nodes within the content tree to be abstracted in this way creating highly scalable stores of information... simply by setting a property on the node.</p>

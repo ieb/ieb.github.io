@@ -1,0 +1,37 @@
+---
+layout: post
+title: Performance and Releases
+date: 2010-10-14 11:00:20.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '3991311'
+  _wp_old_slug: ''
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1300825293";}
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1410730537;}
+  _oembed_2df2f0a02ba8d764b56b967b047cbf43: "{{unknown}}"
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2010/10/14/performance-and-releases/"
+---
+<p>Why does everyone do performance testing at the last minute ? Must be because as a release date approaches the features pile in and there is no time to test if they work or let alone perform. Sadly thats were we are with Nakamura at the moment. We have slipped our release several times now and are seeing a never ending stream of bugs and performance problems. Some of these are just plain bugs, some are problems with single threaded performance and some are problems with concurrency. Plan bugs are easy to cope with, fix them. This late in the cycle the fixes tend to be small in scope because we did at least do some of the early things right, the other two areas are not so easy.</p>
+<h2>Native performance</h2>
+<p>We are using Jetty in NIO mode embedded inside OSGi, and see throughput of around 5k requests/s under concurrent load. Once we add in the first part of the Sling request processing chain in this drops to around 1200/s which is about the peak throughput we can get before we do some serious processing inside Sling. Its interesting to notice the impact of doing anything on throughput. Every layer adds latency that hits throughput, still OOTB the stack is doing Ok. An extensive benchmarking experiment at <a href="http://nichol.as/benchmark-of-python-web-servers">http://nichol.as/benchmark-of-python-web-servers</a> shows that Java and Jetty even in threaded mode is just as good as some fo the event mode deployments of Python WSGI servers, and with a little work could be better. The Achilles heel of most Java applications is the ease with which developers add bloated complexity and soon find that their 5k requests/s drops to 100/s concurrent. Fortunately Jetty in OSGi shows all the signs of being concurrent. The same cannot be said for the rest of Nakamura.</p>
+<h2>Single Threaded Performance</h2>
+<p>In the rush to satisfy the feature stream we have relied to heavily on search. Search comes from Lucene within Jackrabbit and when used correctly its fast, giving first results in sub ms timeframes. However, we are using generic indexes and some of the queries we have to deliver to the UI are not simple, gather data from deep trees and attempt to perform joins throughout the content tree. With an infinite amount of time before the release we would not have done this and would have built custom indexes targeted precisely at the queries that we needed to support, however we didn't, and now we have a problem. Some queries on medium size deployments are down to 2s or more, single threaded. This is pretty awful when you think back to the targets set some time ago of sub 20ms for queries. Dont even ask about multithreaded.  Now, we can probably fix these problems by doing some detailed indexing configuration deep within Jackrabbit.</p>
+<h2>Multi Threaded Performance</h2>
+<p>Disclaimer: Nakamura satisfies a slightly different use case from Sling and Jackrabbit, and so we have made modifications to some of the Jackrabbit code base. Nakamura supports content management where everyone can write content. Sling and Jackrabbit support content management were only a few can write content. That said we have been seeing lots of issues surrounding synchronization blocking concurrent operations deep within Jackrabbit, on read operations. We have found that the default deployment of Jackrabbit contains a single SystemSession per Workspace that is used for access control and where most of the threads capable of writing to the JCR, all threads block synchronously on the SystemSession supporting the access control manager. This doesn't happen in standard Jackrabbit since it can declare the entire workspace read only and read granted an bypass this bottleneck. Still that makes the server single threaded and limits throughput to &lt; 100 request/s. To put that in context Apache Httpd + PHP on the same box wont even get near that figure which is why Moodle (written in PHP) tends to be good for schools. However that bit of good news doesn't help me.</p>
+<p>I fixed the bottleneck problem, reduced the memory footprint and increased stability by binding System Sessions supporting the access control operations to workspaces then threads. Doing this multiplies the memory footprint, but I also evict these sessions on an age basis to prevent them accumulating the entire ACL state of the repository, so under load the server actually uses less memory than before. This is great as it eliminates the synchronization bottleneck and fixes a rare deadlock condition we were seeing in Jackrabbit 2.1 where a writer would block on synchronization because a reader that held the synchronization was waiting for the read lock held by the writer. Unfortunately all this has done is expose the next layer of contention down the stack. In Jackrabbit, past the ItemManager which is owned by the Session, there is a SharedItemManager shared by all sessions. Inside there are concurrent read locks and exclusive write locks. Under load we see these dominating limiting the server to a throughput of around 600 request/s. At this point we are waiting for the next release of Jackrabbit 2.2 which looks like it might have addressed some of these problems. Since we see the throughput drop with more than 10 threads due to concurrency in the locks we are limiting our servers from 200 threads down to 10, queuing up all requests in the Jetty acceptor where the impact is minimal. As soon as you do this on a search URL, all bets are off since one of those can block everything for 2s or turning throughput form 600 to 10/s.</p>
+<h2>Outcome</h2>
+<p>In real terms with the poor search performance that means we can probably only support 100 users per JVM, this isn't anywhere near enough. We can't deploy in a cluster since that won't help sideways scalability much, although there are some patches that could be applied to the ClusterNode implementation to keep the journal sequential but not bound by a transaction lock in the DB. There are more things we could do and I am thinking about. Replace the Jackrabbit RDBMS PM with Cassandra. Write a Jackrabbit SPI based on Cassandra, (I think the SPI is above the SharedItemManager). Write a Sling Resource Provider using Cassandra bypassing Jackrabbit altogether but we would have to unbind from javax.jcr.*, or something else, completely different.</p>
+<p>&nbsp;</p>
+<p>Now, back to our Q1 release.</p>

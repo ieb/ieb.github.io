@@ -1,0 +1,62 @@
+---
+layout: post
+title: SparseMap Content 1.5 released
+date: 2012-02-19 01:29:14.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '3991311'
+  publicize_results: a:1:{s:7:"twitter";a:1:{i:54083831;a:2:{s:7:"user_id";s:5:"_ieb_";s:7:"post_id";s:18:"171043642629308416";}}}
+  _wpas_done_twitter: '1'
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1506431531;}
+  _oembed_19edef94e026c8efc9bd28fe011b0acb: "{{unknown}}"
+  _oembed_24b1ed4b7486a0da3b10130c6bdd3fa0: "{{unknown}}"
+  _oembed_d9299209482495955ae49dc100a052f1: "{{unknown}}"
+  _oembed_091566c533f6828c8d1ba2892bdca159: "{{unknown}}"
+  _oembed_77ffac771b3ed99cd1a6c9c6e1524713: "{{unknown}}"
+  _oembed_16edf1bc718d54d7f04ce2191d4a88de: "{{unknown}}"
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2012/02/19/sparsemap-content-1-5-released/"
+---
+<p>Sparse Map version 1.5 has been tagged (<a href="https://github.com/ieb/sparsemapcontent/tree/org.sakaiproject.nakamura.core-1.3">org.sakaiproject.nakamura.core-1.</a>5) and released. Downloads of the source tree in <a href="https://github.com/ieb/sparsemapcontent/zipball/org.sakaiproject.nakamura.core-1.5">Zip</a> and <a href="https://github.com/ieb/sparsemapcontent/tarball/org.sakaiproject.nakamura.core-1.5">TarGZ</a> form are available from GitHub.</p>
+<p>In this release 14<a href="https://github.com/ieb/sparsemapcontent/issues?sort=created&amp;direction=desc&amp;state=closed&amp;page=1&amp;milestone=6"> issues</a> were addressed, the details are in the <a href="https://github.com/ieb/sparsemapcontent/issues">issue tracker</a>.  This release contains critical fixes to the 1.3 and 1.3 release that make those releases unusable except for the smallest deployments. As with precious releases the SPI bundles for Derby and PostgresSQL have been released, however MySQL and Oracle SPI implementations have not been released in binary forms due to the licenses on the JDBC Drivers for those databases. There are tags in the source repositories for these releases. Again, I have also restrained from releasing the SPI implementations for Cassandra, <a title="HBase" href="http://en.wikipedia.org/wiki/HBase" rel="wikipedia">HBase</a> and <a title="MongoDB" href="http://en.wikipedia.org/wiki/MongoDB" rel="wikipedia">MongoDB</a> as I am not satisfied the implementations are sufficiently tested or complete.</p>
+<p>If you find any issues, please mention them to me or, better still, add an issue to the issue tracker. Unless otherwise stated the license is Apache 2. Thanks to everyone who made this release possible.</p>
+<pre>Tag:  <a href="https://github.com/ieb/sparsemapcontent/tree/org.sakaiproject.nakamura.core-1.5">https://github.com/ieb/sparsemapcontent/tree/org.sakaiproject.nakamura.core-1.</a>5
+Derby SPI Tag: <a href="https://github.com/ieb/sparsemapcontent/tree/org.sakaiproject.nakamura.derby-driver-10.6.2.1-1.5">https://github.com/ieb/sparsemapcontent/tree/org.sakaiproject.nakamura.derby-driver-10.6.2.1-1.5 </a>PostgreSQL SPI Tag: <a href="https://github.com/ieb/sparsemapcontent/tree/org.sakaiproject.nakamura.postgres-driver-9.0-801-1.5">https://github.com/ieb/sparsemapcontent/tree/org.sakaiproject.nakamura.postgres-driver-9.0-801-1.5 </a>MySQL SPI Tag: <a href="https://github.com/ieb/sparsemapcontent/tree/org.sakaiproject.nakamura.mysql-driver-5.1.13-1.5">https://github.com/ieb/sparsemapcontent/tree/org.sakaiproject.nakamura.mysql-driver-5.1.13-1.5 </a>Oracle SPI Tag: <a href="https://github.com/ieb/sparsemapcontent/tree/org.sakaiproject.nakamura.oracle-driver-1.4-1.5">https://github.com/ieb/sparsemapcontent/tree/org.sakaiproject.nakamura.oracle-driver-1.4-1.5</a> 
+Issues Fixed: <a href="https://github.com/ieb/sparsemapcontent/issues?sort=created&amp;direction=desc&amp;state=closed&amp;page=1&amp;milestone=6">https://github.com/ieb/sparsemapcontent/issues?sort=created&amp;direction=desc&amp;state=closed&amp;page=1&amp;milestone=</a>6</pre>
+<p>To use</p>
+<pre>&lt;dependency&gt;
+  &lt;groupId&gt;org.sakaiproject.nakamura&lt;/groupId&gt;
+  &lt;artifactId&gt;org.sakaiproject.nakamura.core&lt;/artifactId&gt;
+  &lt;version&gt;1.5&lt;/version&gt;    
+&lt;/dependency&gt;</pre>
+<p>The Jar is an <a title="OSGi" href="http://en.wikipedia.org/wiki/OSGi" rel="wikipedia">OSGi</a> bundle complete with Manifest, bundled with services. To use you will need to select a SPI implementation fragment bundle and deploy that with the core bundle. Normally this is done when the OSGi Standalone application jar is constructed. In addition to the core SparseMap bundle you will now need one of the the SPI implementation fragments.</p>
+<p>Derby</p>
+<pre>&lt;bundle&gt;
+  &lt;groupId&gt;org.sakaiproject.nakamura&lt;/groupId&gt;
+  &lt;artifactId&gt;org.sakaiproject.nakamura.derby-driver&lt;/artifactId&gt;
+  &lt;version&gt;10.6.2.1-1.5&lt;/version&gt;    
+&lt;/bundle&gt;</pre>
+<div>
+<p>PostgreSQL</p>
+<pre>&lt;bundle&gt;
+  &lt;groupId&gt;org.sakaiproject.nakamura&lt;/groupId&gt;
+  &lt;artifactId&gt;org.sakaiproject.nakamura.postgres-driver&lt;/artifactId&gt;
+  &lt;version&gt;9.0-801-1.5&lt;/version&gt;    
+&lt;/bundle&gt;</pre>
+<div>
+<p>MySQL, Oracle</p>
+<p>Please check out the source code at the appropriate tag and build locally.</p>
+<p>&nbsp;</p>
+</div>
+</div>

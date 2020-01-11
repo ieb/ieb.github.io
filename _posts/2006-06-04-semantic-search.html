@@ -1,0 +1,23 @@
+---
+layout: post
+title: Semantic Search
+date: 2006-06-04 09:29:47.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Search
+- Thought
+tags: []
+meta: {}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2006/06/04/semantic-search/"
+---
+<p>Currently Search performs its indexing on text streams. There is a significant amount of information that can be extracted from entities, beside the simple digest of content. This includes things like the entity reference, the URL, title, description etc. There is also other information. We could create multiple indexes for this in Lucene quite easily, but it would not necessarily provide the search structure that is required. A better approach is probably going to be to represent this in RDF. So Im going to try and enhance the EntityContentProcuder with an RDF stream and place a pluggable RDF triple store underneath the search engine to operate as a secondary stream. Its quite possible that this will solve some of the search clustering problems and will certainly address the results clustering that would begin to make search really cool.</p>

@@ -1,0 +1,38 @@
+---
+layout: post
+title: Java Web Start for server applications
+date: 2010-12-04 15:40:45.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '3991311'
+  _wp_old_slug: ''
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1300451159";}
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1515155476;}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2010/12/04/java-web-start-for-server-applications/"
+---
+<p>If you want to make a Java Web Start distribution of a web application server built by maven, the there is a neat plugin to make it a bit easier, webstart-maven-plugin from org.codehaus. However, even if you give it full permissions and sign everything correctly, it probably wont work as the SecurityManager that the Java Web Start Client uses is going to stop all sorts of things, like finding the current users home directory, that a normal server app would have no problem with. So, first make certain that you have</p>
+<pre>&lt;security&gt;     
+   &lt;all-permissions/&gt;
+&lt;/security&gt;</pre>
+<p>In the jnlp file.</p>
+<p>That will give you just enough permissions to replace the security manger on the main class. If you do this before chaining to your real main class you probably wont have to change you app. All of this assumes that you app doesn't actively do something with its own security manager and policy file.</p>
+<pre>package org.sakaiproject.nakamura.app;
+import org.apache.sling.launchpad.app.Main;
+public class JNPLMain {  
+     public static void main(String[] args) {
+           System.setSecurityManager(null);
+           Main.main(args);        
+      }
+}</pre>

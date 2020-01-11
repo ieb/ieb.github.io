@@ -1,0 +1,24 @@
+---
+layout: post
+title: Faster Jackrabbit
+date: 2009-03-12 22:47:11.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '3991311'
+  reddit: a:2:{s:5:"count";s:1:"0";s:4:"time";s:10:"1239568238";}
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1239568231";}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2009/03/12/faster-jackrabbit/"
+---
+<p>Just with everything, there are right ways to do thing and wrong ways. It looks like Jackrabbit is the same, doing lots of saves generates lots of version history in jackrabbit and results in lots of DB traffic which makes all JCR operations slow. If  you can, one save per request cycle, and binding  transaction manager to the JCR objects means that all SQL activity is performed at the end of the request cycle in one block. Having seen the impact of a small amount of tuning on write performance, I think there will be scope for more.</p>

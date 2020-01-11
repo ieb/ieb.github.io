@@ -1,0 +1,24 @@
+---
+layout: post
+title: Content Hosting API in 170
+date: 2006-08-02 21:22:51.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Thought
+tags: []
+meta: {}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2006/08/02/content-hosting-api-in-170/"
+---
+<p>Almost there,   One thing that I dont know if its a good idea or not, but the Groups  attributes associated with entities inside content hosting are stored in  content hosting. So if you want to let Content Hosting manage its  security underneath, by talking to AuthZGroups, then you have to stop it  asking itself.</p>
+<p>'Is it ok to look at this node to find out if I can look at this node to  find out if I can look at this node to find out if I can look at this  node to find out if I can look at this node....'</p>
+<p>Fortunately there is a thing called a Security Advisor which can be used  to remove security constraints below a certain point in the request  cycle. Its also a really good way to make the whole thing go much faster  and remove the load on the AuthZGroups resolution.</p>

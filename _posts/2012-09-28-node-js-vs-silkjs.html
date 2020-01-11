@@ -1,0 +1,52 @@
+---
+layout: post
+title: Node.js vs SilkJS
+date: 2012-09-28 09:25:34.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags:
+- Asynchrony
+- I/O bound
+- Node.js
+- Open source
+- SilkJS
+- V8 (JavaScript engine)
+- WebSocket
+meta:
+  _edit_last: '3991311'
+  _wpas_done_77605: '1'
+  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:1:{s:63:"http://farm9.static.flickr.com/8013/7196742456_481fb8e06d_m.jpg";a:6:{s:8:"file_url";s:63:"http://farm9.static.flickr.com/8013/7196742456_481fb8e06d_m.jpg";s:5:"width";i:240;s:6:"height";i:180;s:4:"type";s:5:"image";s:4:"area";i:43200;s:9:"file_path";s:0:"";}}s:6:"videos";a:0:{}s:11:"image_count";i:1;s:6:"author";s:7:"3991311";s:7:"blog_id";s:7:"6575768";s:9:"mod_stamp";s:19:"2012-09-28
+    23:51:21";}
+  _oembed_fbb6b254e63e8c385a75763b56728c12: "{{unknown}}"
+  _oembed_0fc2aaca48fb85c3743e136548170cf3: "{{unknown}}"
+  _oembed_943b56aadc4048f252174c70d47af0f1: "{{unknown}}"
+  _oembed_1e282c7e0eeff1443840a010ea790329: "{{unknown}}"
+  _oembed_6c4cceecccbf4a22fd72fd46357326c2: "{{unknown}}"
+  _oembed_fe0209a1e03d14055927717c5babae5b: "{{unknown}}"
+  twitter_cards_summary_img_size: a:7:{i:0;i:240;i:1;i:180;i:2;i:1;i:3;s:24:"width="240"
+    height="180"";s:4:"bits";i:8;s:8:"channels";i:3;s:4:"mime";s:9:"image/gif";}
+  _oembed_9179bee65a05ab5f3460cc01acf2c12d: "{{unknown}}"
+  _oembed_6d125cbb8554c1d219948f2bd327af88: "{{unknown}}"
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2012/09/28/node-js-vs-silkjs/"
+---
+<p><a class="alignright zemanta-img" href="http://www.flickr.com/photos/78308472@N05/7196742456" target="_blank"><img class="zemanta-img-inserted zemanta-img-configured" title="synchronous ducks" src="{{ site.baseurl }}/assets/7196742456_481fb8e06d_m.jpg" alt="synchronous ducks" width="240" height="180" /></a></p>
+<p><a class="zem_slink" title="Node.js" href="http://en.wikipedia.org/wiki/Node.js" rel="wikipedia" target="_blank">Node.js</a>, everyone on the planet has heard about. Every developer at least. SilkJS is relatively new and creates an interesting server to compare Node.js against because it shares so much of the same code base. Both are based on the Google <a class="zem_slink" title="V8 (JavaScript engine)" href="http://en.wikipedia.org/wiki/V8_%28JavaScript_engine%29" rel="wikipedia" target="_blank">V8 Javascript engine</a> that convert JS into compiled code before executing. Node.js as we all know uses a single thread that uses a OS level event queue to process events. What is often overlooked is that Node.js uses a single thread, and therefore a single core of the host machine. SilkJS is a threaded server using pthreads where each thread processes the request leaving it upto the OS to manage interleaving between threads while waiting for IO to complete. Node.js is often refereed to as Async and SilkJS is Sync. The advantages to both approaches that are the source of many flame wars. There is a good <a href="http://silkjs.org/sync-vs-async/">summary</a> of the differences and reasons for each approach on the SilkJS website. In essence SilkJS claims to have a less complex programming model that does not require the developer to constantly think of everything in terms of events and callbacks in order to coerce a single thread into doing useful work whilst IO is happening. Although this approach hands the interleaving of IO over to the OS letting it decide when each pthread should be run. OS developers will argue that thats what an OS should be doing and certainly to get the most out of modern multicore hardware there is almost no way of getting away from the need to run multiple processes or threads to use all cores. There is some evidence in the benchmarks (horror, benchmarks, that's a red rag to a bull!) from Node.js, SilkJS, Tomcat7, Jetty8, Tornado etc that using multiple threads or processes is a requirement for making use of all cores. So what is that evidence ?</p>
+<p>Well, first read why not to trust benchmarks <a href="http://webtide.intalio.com/2010/06/lies-damned-lies-and-benchmarks-2/">http://webtide.intalio.com/2010/06/lies-damned-lies-and-benchmarks-2/</a> once you've read that lets assume that everyone creating a benchmark is trying to show their software off best.</p>
+<p>The Node.js 0.8.0 gives a request/second benchmark for a 1K response at 3585.62 request/second. <a href="http://blog.nodejs.org/2012/06/25/node-v0-8-0/">http://blog.nodejs.org/2012/06/25/node-v0-8-0/</a></p>
+<p>Over at <a href="http://vertxproject.wordpress.com/2012/05/09/vert-x-vs-node-js-simple-http-benchmarks/">Vert.x</a> there was an of Vert.x and Node.js showing Vert.x running at 300,00 requests/s. You do have to take it with a pinch of salt after you have read another post <a href="http://webtide.intalio.com/2012/05/truth-in-benchmarking/">http://webtide.intalio.com/2012/05/truth-in-benchmarking/</a> with some detailed analysis that points out testing performance on the same box with no network and no latency is theoretically interesting, but probably not informative for the real world. What is more important is can the server stand up reliably forever with no downtime and perform normal server side processing.</p>
+<p>So the SilkJS benchmarks in one of its more reasonable benchmarks claim it runs at around 22,000 request per second delivering 13K of file from disk with a very high levels of concurrency 20000. Again its hard to tell how true the benchmark is since many of those requests are pipelined (no socket open overhead), but one thing is clear. With a server capable of handling that level of concurrency some of the passionate arguments supporting async servers running one thread per core are lost. Either way works.</p>
+<p>There is a second side to the SilkJS claims that bears some weight. With 200 server threads, what happens when one dies or needs to do something that is not <a class="zem_slink" title="I/O bound" href="http://en.wikipedia.org/wiki/I/O_bound" rel="wikipedia" target="_blank">IO bound</a>? Something mildly non trivial that might use a tiny bit of CPU. With 1 server thread we know what happens, the server queues everything up while the on server thread does that computation. With 200, the OS manages the time spent working on the 1 thread. There is a simple answer, offload anything that does and processing to a threaded environment, but then you might as well use an async proxy front end to achieve the same.</p>
+<p>There is a second part of the SilkJS argument that holds some weight. What happens when 1 of the SilkJS workers dies? Errors that kill processes happen for all sorts of reasons, some of them nothing to do with the code in the thread. With 199 threads the server continues to respond, with 0 it does not. At this point everyone who is enjoying the single-threaded simplicity of an async server will, I am sure, be telling me their process is so robust it will never die. That may well be true, but process sometimes dont always die, sometimes they get killed. The counter argument is, what happens when all 199 threads are busy running something. The threaded server dies.</p>
+<p>To be balanced, life in an async server can be wonderfully simple. There is absolutely no risk of thread contention since there is only ever one thread, and it doesn't matter how long a request might be pending for IO for as all IO is theoretically non blocking. It doesn't mater how many requests there are provided there is enough memory to represent the queue. Synchronous servers can't do long requests required by <a class="zem_slink" title="WebSocket" href="http://en.wikipedia.org/wiki/WebSocket" rel="wikipedia" target="_blank">WebSockets</a> and CometD. Well they can, but the thread pool soon gets exhausted. The ugly truth is that async servers also have something that gets exhausted  Memory. Every operation in the event queue consumes valuable memory, and with many garbage collected system, garbage collection is significant. Although it may not be apparent at light loads, at heavy loads even if CPU and IO are not saturated, async servers suffer from memory exhaustion and or garbage collection trying to avoid memory exhaustion, which, may appear as CPU exhaustion. So life is not so simple, thread contention is replaced by memory contention which is arguably harder to address.</p>
+<h2>So what is the best server architecture for modern web application?</h2>
+<p>An architecture that uses threads for requests that can be processed and delivered in ms, consuming no memory and delegating responsibility for interleaving IO to the OS, the resident expert at that task. Coupled with an architecture that recognises long IO intensive requests as such and delegates them to async part of the server, and above all, an architecture on which a simple and straightforward framework can be built to allow developers to get on with the task of delivering applications at webscale, rather than wondering how to achieve webscale with high load reliability. I don't have an answer, other than it could be built with Jetty, but I know one thing, the golden bullets on each side of this particular flame war are only part of the solution.</p>

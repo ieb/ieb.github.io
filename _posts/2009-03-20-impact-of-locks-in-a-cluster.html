@@ -1,0 +1,28 @@
+---
+layout: post
+title: Impact of Locks in a cluster
+date: 2009-03-20 10:45:35.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  reddit: a:2:{s:5:"count";s:1:"0";s:4:"time";s:10:"1242152282";}
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1242152280";}
+  _edit_last: '3991311'
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2009/03/20/impact-of-locks-in-a-cluster/"
+---
+<p>I thought JCR locking was a potential solution, but there are some issues. With Jackrabbit, each lock generates a journal entry, and it looks like there might be some journal activity generated with attempting to get a lock.</p>
+<p>Using the locking mechanism in the previous post. I have one update to a property on one node. Performed 200 times, by ten threads concurrently. That leads to 19K journal updates. If I unwind the threads and the operations into loops performing the work sequentially for the 2000 operations I get about 4000 journal entries. Which means that locking multiplies the number of database operations in Jackrabbit by about 4x under load. Since these are write operations and they need to be replayed on all application server nodes in a cluster that might not be acceptable.</p>
+<p>There are 2 other approaches to this problem. Accept that the exception can happen, and handle it in the same way you would a optimistic lock failure, or create a RDBMS lock scheme.</p>
+<p>The optimistic lock failure recovery has complications since it requires perfect transactional isolation in the application code.</p>
+<p>The RDBMS locking table might work provided the root persisted node can be identified. It may also be possible to implement this with a cluster replicated cache avoiding any DB overhead.</p>

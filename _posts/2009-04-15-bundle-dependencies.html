@@ -1,0 +1,42 @@
+---
+layout: post
+title: Bundle Dependencies
+date: 2009-04-15 09:52:12.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  reddit: a:2:{s:5:"count";s:1:"0";s:4:"time";s:10:"1288785638";}
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1288785637";}
+  _edit_last: '3991311'
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2009/04/15/bundle-dependencies/"
+---
+<p>Having spent a lot of time resolving bundle dependencies over the last two weeks here are some of the thing that I have learnt.</p>
+<p>1. Use the BND tool and the maven bundle plugin to build the maifest, doing it by hand except for the simplest bundle is hard.</p>
+<p>2. Dont assume that every  package needs to be imported. Things like commons-logging have 10's of optional packages that you are probably never going to use. To filter these you can remove them with (maven-bundle-plugin)</p>
+<pre>&lt;Import-Package&gt;
+!org.apache.avalon.*,
+*
+&lt;/Import-Package&gt;</pre>
+<p>But remember to put the excludes (!) before the global include (*).</p>
+<p>3. You never know how an OSGi container might be configured so don't assume that everything jre comes from the boot classloader, it may come from a Framework bundle. You can use the <em>resolution:=optional</em> statement to ensure this is handled. Remember if its not imported into a bundle, then it wont be loaded.</p>
+<pre>&lt;Import-Package&gt;
+!org.apache.avalon.*,
+*,
+org.xml.sax;resolution:=optional
+&lt;/Import-Package&gt;</pre>
+<p>4. If you are feeling really lazy and want the bundle to load but generate ClassNotFoundExceptions later then just use <em>*;resolution:=optional</em> on all imports.</p>
+<p>5. NoClassDefinitionError means that something the class depends on was not imported into the package, but it is exported by annother bundle. Bundles are private parties, <em>"If your not on the list your not comming in!"</em> import == the list.</p>
+<p>6. Package locally. If you have a jar that is private to the bundle and unlikely to be of use to anyone else, package it locally inside the bundle with <em>&lt;Embed-Dependency&gt;</em>, just because you can create a bundle, doesn't mean you should.</p>
+<p>7. Don't assume that the OSGi framework is telling you the truth. Often a bundle will report an error like the NoClassDefinitionError. That bundle may not be at fault, look carefully at the stack trace to determine the class where the error happened, and then think carefully which classloader and hence bundle was in use when the error happened.</p>
+<p>8. Dont assume that if you are having classloader problems or resolution problems that you can reload bundles. I have found the reloading bundles only works reliably when there are no classloader or resolution problems. When there are, its anyones guess what state the OSGi container is left in. I have been sutting down, and completely deleiting all state as the only reliable way of debuging dependencies, YMMV.... enjoy:)</p>

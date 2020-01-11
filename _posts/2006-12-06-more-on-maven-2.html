@@ -1,0 +1,25 @@
+---
+layout: post
+title: More on Maven 2
+date: 2006-12-06 13:33:29.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Thought
+tags: []
+meta: {}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2006/12/06/more-on-maven-2/"
+---
+<p>After looking at the options, and being pointed at an XSL by Dave  DeWolf, I've written a script that scans the Sakai code base and  converts all project.xml files to poms and the builds the necessary multiproject module definitions.</p>
+<p>Its not perfect yet, but its getting there. Unfortunately since we extended project.xml format and added properties  to define the deploy type, I've had to modify the standard conversion  script to make it Sakai specific. There will still be a need for a  plugin, but probably only for the deploy part of the build.</p>
+<p>There are 2 options here, a maven1 plugin for maven2, or take the pluto  deploy plugin and extend it to include deployment of components. Since  we may be deploying 168 components in the future, the pluto approach has  merits.</p>
+<p>When I have something that builds I will post the conversion scripts.</p>

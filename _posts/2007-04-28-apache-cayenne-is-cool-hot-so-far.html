@@ -1,0 +1,28 @@
+---
+layout: post
+title: Apache Cayenne Is Cool (Hot, So far)
+date: 2007-04-28 12:52:24.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta: {}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2007/04/28/apache-cayenne-is-cool-hot-so-far/"
+---
+<p>The first weeks of a marriage are bliss, and I guess thats what the first hours of using yet another ORM tool is like. And so far, 4 hours in I'm having real fun (sad) with Apache Cayenne. I have a largish schema, not related to Sakai that I need to map, about 80 entities, mostly legacy with some reasonably complex relationships. The Cayenne Modeler tool and its integration with Eclipse is excellent, as is their getting started documentation.</p>
+<p>After 30 minutes I had the whole schema mapped and building in Eclipse.</p>
+<p>After 90 minutes after some problems with Spring XML (not related) the DataContext is up and running and I am able to navigate existing object.</p>
+<p>Didn't even have to write a finder or any ORM code at this point.</p>
+<p>Unfortunately the database I am working with has no relationships recorded in the DB, but the modeler is letting me do this and once the relationships are marked when I add the mappings into the classes it knows which ones to use, it understands reverse navigation. At the moment it just looks like it works.</p>
+<p>I am bound to hit problems at some point, but the first impression is nothing like it was with Hibernate2 and Spring, 4 hours of hard work followed by a trip to the bookshop.</p>
+<p>Although there isn't an obvious spring integration, it looks modular and will probably integrate with no problems. It might need a bit of configuration around the DataSource, but it looks like its not nearly as picky about being in Sakai Shared and will share a connection. So far its working so well, I haven't had to look too far inside to work that one out.</p>
+<p>No wonder it popped up as a top level project at Apache so fast.</p>

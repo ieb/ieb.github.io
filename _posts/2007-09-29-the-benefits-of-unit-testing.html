@@ -1,0 +1,26 @@
+---
+layout: post
+title: The benefits of Unit testing.
+date: 2007-09-29 11:39:58.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Thought
+tags: []
+meta: {}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2007/09/29/the-benefits-of-unit-testing/"
+---
+<p>Ok, so its only one data point, but it illustrates the benefits of unit  testing.</p>
+<p>3 weeks without starting Sakai fixing a blocker bug in search. That  three weeks has not been spent just writing code, but has mainly been  spent writing unit tests. Initially simple test, then more complex multi  threaded tests simulating life in a cluster.</p>
+<p>After sorting out the Spring configuration file and getting that working  (there has to be a better way of doing IoC). The search component starts  up and runs in soak mode (constantly indexing) for 12 hours on 500MB of  data. First Time! No Errors!</p>
+<p>When in unit test mode, the developer cycle time was 10 seconds or less.  Starting up Sakai still take at least 60.... you get bored... go read  emails... write blogs :)</p>
+<p>Unit testing... now you know it makes sense!</p>

@@ -1,0 +1,29 @@
+---
+layout: post
+title: Cayenne Plugin
+date: 2008-04-24 11:48:38.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta: {}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2008/04/24/cayenne-plugin/"
+---
+<p>
+I have been playing with Shindig to create a datamodel to go behind the OpenSocial API. At first I thought it would be simple to use JDBC direct, but it turns out that the model has a reasonable number of dependencies and the entities are quite big. So, I decided to use Cayenne. The model is created and has some simple test cases, and it all appears to work. I did write a maven plugin to generate SQL scripts from the Cayenne model, so its supports about most major databases (about 8). Creating the model from some Java interfaces was quite easy, infact I did most of it by converting the java class into cayenne XML.</p>
+<p>
+The SQL that this generates at runtime, when querying etc appears much cleaner than Hibernate.... from a DBA point of view.</p>
+<ul>
+<li><a href="https://source.sakaiproject.org/contrib//tfd/trunk/social-db/">https://source.sakaiproject.org/contrib//tfd/trunk/social-db/  The OpenSocial API Data layer</a></li>
+<li><a href="https://source.sakaiproject.org/contrib//tfd/trunk/social-db/src/main/java/org/apache/shindig/social/opensocial/db/SocialMap.map.xml">https://source.sakaiproject.org/contrib//tfd/trunk/social-db/src/main/java/org/apache/shindig/social/opensocial/db/SocialMap.map.xml  The Cayenne model</a></li>
+<li><a href="https://source.sakaiproject.org/contrib//tfd/trunk/maven-cayenne-plugin/">https://source.sakaiproject.org/contrib//tfd/trunk/maven-cayenne-plugin/  A maven 2 Cayenne plugin that generates the SQL scripts for creating the DB</a></li>
+</ul>

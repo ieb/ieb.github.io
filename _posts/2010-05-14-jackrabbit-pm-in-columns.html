@@ -1,0 +1,27 @@
+---
+layout: post
+title: Jackrabbit PM in columns
+date: 2010-05-14 16:24:33.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '3991311'
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1295280288";}
+  reddit: a:2:{s:5:"count";s:1:"0";s:4:"time";s:10:"1334581871";}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2010/05/14/jackrabbit-pm-in-columns/"
+---
+<p>A while back I <a href="http://www.mail-archive.com/users@jackrabbit.apache.org/msg14250.html">asked</a> about Cassandra as a Persistence Manger for Jackrabbit 2. The problem that exists with any Column DB and to some extends Cassandra (although it has a concept of Quorum) is that the persisted value is eventually consistent over the whole cluster. Jackrabbit PM's, at least in JR2 and earlier need a level of ACID in what they do. The PM acts as a central Transaction Monitor streaming updates to storage and maintaining an in memory state. If you look a JR running against an RDBMS this is obvious. The ratio of select to modify is completely reversed with 90% update and 10% read inspite of the JR application experiencing 90% read and 10% update. This presents no problem on a single node, provided the PM give some guarantees to ACID like behaviour. The problem comes when JR is run in a cluster. When the state of items is changed on one node, that change must be known on all nodes, so that their internal caches can be adjusted. Thats what the ClusterNode implementation in JR2 does. In a cluster it goes further. The sequence which the changes are applied must be consistent, so that a add, remove, add happens in that order, on all nodes. Finally, and crucially for a persistence that is eventually consistent, all nodes must be able to see  the committed version of an item when they receive the event concerning the item.</p>
+<p>Thats why I asked about Cassandra. If you took the existing RDBMS ClusterNode implementation, which uses a DB table to ensure the sequence of events is the same on all nodes, then events would get replayed correctly, but when they accessed their local connection to the column DB, its almost certain that their local state would not be sufficiently consistent to provide the correct version of the data. I have ignored the slight problem that the journal managed by a central DB is still a central point of failure, a synchronization point for the entire cluster (with a reasonable amount of latency), and botteneck for throughput.</p>
+<p>So I did a bit of playing, its not complete, but I think its possible to have a ClusterNode implementation tightly coupled with a PM, where the ClusterNode uses JGroups to manage the journal sequence, with one elected master emitting sequence numbers and all slaves listening in waiting to become the next master should the current one fail. The approach looks like it will happily produce sequence at several orders of magnitude greater than the central DB approach. The second part is to use the modified ClusterNode to communicate a version of the Item in its event. Should the receiving node not get that version of the item, it can come back to the originating node and ask it for a copy, avoiding the problems of eventual consistency and the penalty of a fully quorate column db. Now, I havent tested any of this other than the cluster node impl, so I dont know if trafic back to the consistent node for the correct version of the item will dominate or not, but it all looks feasable.</p>
+<p>Having said all that, the discussions on JR3 which looks like making it into trunk any moment now may make all of this obsolete, as there was talk of using a append only node hierarchy store, simular to that used by Git, CouchDB and others. This might still need to overcome the consistency issues when distributed, but it would be core rather than bolt on. Need to go an look ....</p>

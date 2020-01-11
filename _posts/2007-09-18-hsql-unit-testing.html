@@ -1,0 +1,31 @@
+---
+layout: post
+title: HSQL Unit testing
+date: 2007-09-18 16:35:46.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags: []
+meta: {}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2007/09/18/hsql-unit-testing/"
+---
+<p>
+Dont be fooled by HSQL Unit testing... its transaction isolation may lead you to beleive that your unit tests are working perfectly, but  its doesnt support READ_COMMITTED transaction isolation, and its a true transaction monitor when it comes to committing the data, ie the code is single threadded. Since Sakai uses READ_COMMITTED for its transaction isolation in production, rahter than READ_DIRTY, tests that work on HSQL will not work in production, and tests that work in production wont work in HSQL.</p>
+<pre class="prettyprint">
+update testtable set x = x + 1 where id = 99;
+select x from testtable where id = 99;
+commit;
+</pre>
+<p>
+If test table contains 1, and you do this in HSQL on multiple threads, there will be collisions on what is selected from testtable, since the sect reads the dirty data direct from the database, and not the data in the transaction. In MySQL and Oracle, each thread will give a unique number since a) the select is taken from the value in the transaction and, b) until the commit fires, the record is locked for update. Most of the time it doesnt matter, but if you are doing any tests that involve more than one thread, beware.</p>
+<p>
+There is an alternative, DerbyDB from apache, that has an Apache license and so can be used in maven poms, however the dialect is not the same as Oracle, MySQL or HSQL. Have a read of <a href="http://mail-archives.apache.org/mod_mbox/db-derby-dev/200501.mbox/%3C446591124.1106594315052.JavaMail.jira@ajax.apache.org%3E">this</a> for more details.</p>

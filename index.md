@@ -3,7 +3,7 @@
 # Utilities
 
 * [Cowes Week 2018 route generator](marks/genkml.html)
-* [Cowes Week 2018 route planner](marks/dist)
+* [Cowes Week 2018 route planner](marks/index.html)
 * [Cowes Week 2018 Marks in CSV format](marks/CowsWeek2018Marks.csv)
 
 # Notes

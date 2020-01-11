@@ -1,0 +1,39 @@
+---
+layout: post
+title: Fibonacci ring for Cassandra
+date: 2012-10-10 07:58:01.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags:
+- Apache Cassandra
+- Cassandra
+- Distributed computing
+- Fibonacci
+- Fibonacci number
+- Linear Congruential Generator
+- Vi Hart
+meta:
+  _edit_last: '3991311'
+  publicize_reach: a:2:{s:7:"twitter";a:1:{i:77605;i:83;}s:2:"wp";a:1:{i:0;i:8;}}
+  _wpas_done_77605: '1'
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:54083831;b:1;}}
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2012/10/10/fibonacci-ring-for-cassandra/"
+---
+<p>[caption id="" align="alignright" width="300"]<a href="http://commons.wikipedia.org/wiki/File:Protea_flower.jpg" target="_blank"><img class="zemanta-img-inserted zemanta-img-configured" title="King Protea (Protea cynaroides)" src="{{ site.baseurl }}/assets/300px-Protea_flower.jpg" alt="King Protea (Protea cynaroides)" width="300" height="200" /></a> King Protea (Protea cynaroides) (Photo credit: Wikipedia)[/caption]</p>
+<p>No this isn't a greek tragedy or some software that I have written, but a thought about the way in which Apache Cassandra an other distributed systems perform problem space decomposition. Cassandra is a good example of a distributed system with problem space decomposition. Its problem space is keys. To be efficient it needs to distribute those keys evenly around its cluster. The key partitioning algorithm normally uses something that generates a flat even distribution. A <a href="http://en.wikipedia.org/wiki/Linear_congruential_generator">Linear Congruential Generator</a>  could be used if you are prepared to live with some banding in the problem space. If not and you are prepared to live with a bit more computational expense one of the hash functions like MD5 or SHAx. In fact the standard key distribution functions in Cassandra use something based on MD5, which to my naive mind must have some collisions.</p>
+<p>In reading the Cassandra documentation and using it some years back I became concerned about how elastic Cassandra is. The decomposition of Cassandra's key domain is often represented as a ring. That ring is constructed when the cluster is creates and elements are allocated via the key-&gt; ring function, I think they are called partitioners. From reading the documentation, partitioning of this space if fixed and static. If more nodes need to be added to a Cassandra cluster then the partitioning scheme must be updated and data must be migrated from existing nodes in the cluster to their new home before the cluster can become full active again. I think I got that right. That means, although you can replace nodes, you can't elastically scale without partitioning work. I am not absolutely clear if that means the re-partitioning work can be done on a live system, or not. I would hope it can.</p>
+<p>That got me thinking. There are other systems that repartition effectively during operation. Algebraic Multigrids used to solve high Reynolds number Eulerian grids repartition to accelerate the solution phase. I wrote a parallel AMG solver to run on Cray T3Ds in 1995. It was fast, efficient with good conversion rates  but struggled to beat the Cray vectorised versions of the code base on reasonable sized clusters. There is another. A plant. A plant doesn't shutdown when it adds petals to its flower or leaves to its stem it keeps running (so to speak, I havent seen a running flower since University). The plants domain space that its partitioning is sunlight. As it adds leaves doesn't add leaves as a whole ring, but it adds them one by one to make the most use of the available sunlight without shading other spaces. It doesn't require that the cells from one leaf or petal migrate to the new leaf. In essence a plant has achieved the trick of scaling elastically.</p>
+<h2>How does it do this ?</h2>
+<p>There is a biological explanation associated to levels of hormones in the stem which are triggered by light levels which could be considered to be as adaptive as the AMG solver is, driven by its solution. Stepping back a bit there is an observation often used in math classes. The number of spirals in many plants is observed to be adjacent numbers in the <a class="zem_slink" title="Fibonacci number" href="http://en.wikipedia.org/wiki/Fibonacci_number" rel="wikipedia" target="_blank">Fibonacci sequence</a>, often 8, 13 and 21 but sometimes as high as 144 spirals. There is a <a href="http://www.khanacademy.org/math/vi-hart/v/doodling-in-math--spirals--fibonacci--and-being-a-plant--1-of-3">delightful explanation</a> of <a class="zem_slink" title="Conifer cone" href="http://en.wikipedia.org/wiki/Conifer_cone" rel="wikipedia" target="_blank">Pinecones</a>, Pineapples, <a class="zem_slink" title="Protea" href="http://en.wikipedia.org/wiki/Protea" rel="wikipedia" target="_blank">Protea</a> and the Fibonacci sequence by <a class="zem_slink" title="Vi Hart" href="http://www.youtube.com/Vihart" rel="youtube" target="_blank">Vi Hart</a>, even if you think you have learnt everything, its fun to watch.</p>
+<h2>How is this relevant ?</h2>
+<p>I wonder if a Cassandra ring seeded with an initial space that allowed say 5 partitions, but as those partitions passed a threshold of say 30% (with an even distribution) another partition was added. That new partition would attract new keys without requiring migration of the existing keys ensuring that the original partitions never filled. If successful as new nodes were added in the same way as segments are added to a pineapple the Cassandra cluster could scale elastically, or more elastically than it appears to do currently. That really is just a thought, and I havent written a partitioner yet to see if it would work. I think the partitioner would be based on the the ratio of adjacent numbers in the Fibonacci sequence. ie, the <a href="http://en.wikipedia.org/wiki/Golden_angle">Golden Angle</a></p>

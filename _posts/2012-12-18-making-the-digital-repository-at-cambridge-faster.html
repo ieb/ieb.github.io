@@ -1,0 +1,46 @@
+---
+layout: post
+title: Making the Digital Repository at Cambridge Fast(er)
+date: 2012-12-18 01:45:48.000000000 +00:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories: []
+tags:
+- Apache HTTP Server
+- Apache HTTPD
+- Apache Solr
+- Digital Library
+- DSpace
+- Dspace 3
+- Open Access
+- Uniform Resource Locator
+meta:
+  _edit_last: '3991311'
+  publicize_twitter_user: _ieb_
+  _wpas_done_77605: '1'
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:54083831;b:1;}}
+  _wpas_skip_77605: '1'
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2012/12/18/making-the-digital-repository-at-cambridge-faster/"
+---
+<p>For the past month or so I have been working on upgrading the Digital Repository at the University of Cambridge Library from a heavily customised version of <a class="zem_slink" title="DSpace" href="http://en.wikipedia.org/wiki/DSpace" target="_blank" rel="wikipedia">DSpace</a> 1.6 to a minimally customised version of DSpace 3. The local customizations were deemed necessary</p>
+<p>[caption id="" align="alignright" width="120"]<a href="http://www.dspace.cam.ac.uk/handle/1810/233711"><img alt="" src="{{ site.baseurl }}/assets/TS-AS-155-155-F.jpg" width="120" height="150" /></a> List of commandments from Lev. 9–12; numbered Halakhot 8–18; includes a list of where they appear in Maimonides' Book of Commandments and the Mishneh Torah, and possibly references to another work.[/caption]</p>
+<p>to achieve the performance required to host the 217,000 items and the 4M metadata records in the Digital Repository. DSpace 3 which was releases at the end of November 2012 showed promise in removing the need for many of the local patches. I am happy to report that this has proved to be the case and we are now able to cover all of our local use cases using a stock DSpace release with local customizations and optimizations isolated into an overlay. One problem however remains, performance.</p>
+<p>The current Digital Repository contains detailed metadata and is focused on preservation of artifacts. Unlike the more popular <a href="http://cudl.lib.cam.ac.uk/">Digital Library</a> which has generated significant <a href="http://www.bbc.co.uk/news/uk-england-cambridgeshire-20711692">media interest </a>in recent weeks with items like "A 2,000-year-old copy of the 10 Commandments" , the Digital Repository does not yet have significant traffic. That may change in the next few months as the UK government is taking a lead in the <a href="http://www.guardian.co.uk/science/2012/jul/25/uk-government-open-access-development-research">Open Access agenda</a> which may prompt the rest of the world to follow. Cambridge, with its leading position in global research will be depositing its output into its Digital Repository. Hence, a primary concern of the upgrade process was to ensure that the Digital Repository could handle the expected increase in traffic driven by Open Access.</p>
+<h2>Some basics</h2>
+<p>DSpace is a Java web application running in Tomcat. Testing Tomcat for a trivial application reveals that it will deliver content at a peak rate of anything up to 6K pages per second. If that rate were sustained for 24h, 518M pages would have been served. Unfortunately traffic is never evenly distributed and applications always add overhead but this gives an idea of the basics. At 1K pages/s 86M pages would be served in 24h. Many real Java webapps are capable of jogging along happily at that rate. Unfortunately DSpace is not. It's an old code base that has focused on the preservation use case. Many page requests perform heavy database access and the flexible Cocoon based XMLUI  is resource intensive. The modified 1.6 instance using a JSP UI delivers pages at 8/s on a moderate 8 core box and the unmodified DSpace 3, using the XMLUI instance a 15/s on a moderate 4 core box. Surprisingly, because the application does not have any web 2.0 functionality to speak of, even at that low level it feels quite nippy as each page is a single request once the page assets (css/js/png etc) are distributed and cached. With the Cambridge Digital Library regularly serving 1M pages per hour, Open Access on the Digital Repository at Cambridge will change that. Overloaded DSpace remains solid and reliable, but slow.</p>
+<h2>Apache Httpd mod_cache to the rescue</h2>
+<p>Fortunately this application is a publishing platform. For anonymous users that data changes very slowly and the number of users that log into the application is low. The DSpace URLs are well structured and predictable with no major abuse of the HTTP standard. Event the search operations backed by Solr are well structured. The current data set of 217K items published as html pages represents about 3.9GB of uncompressed data, less if the responses are stored and delivered gzipped. Consequently configuring Apache HTTPD with mod_cache to cache page responses for anonymous users has a dramatic impact on throughput. A trivial test with Apache Benchmark over 100 concurrent connections indicates a peak throughput of around 19K pages per second. I will leave you to do the rest of the maths. I think network will be the limiting factor.</p>
+<h2>Loosing statistics</h2>
+<p>There are some disadvantages to this approach. Deep within DSpace statistics are recorded. Since the cache will serve most of the content for anon users these statistics no longer make sense. I have misgivings about the way in which the statistics are being collected since if the request is serviced by Cocoon, the access is recorded in a Solr Core by performing an update operation on the core. This is one of the reasons why the throughput is slow, but I also have my doubts that this is a good way of recording statistics. Lucene indexes are often bounded by the cardinality of the index. I worry that over time the Lucene indexes behind the Solr instance recording statistics will overflow available memory. I would have thought, but have no evidence, that recording stats in a <a class="zem_slink" title="Big data" href="http://en.wikipedia.org/wiki/Big_data" target="_blank" rel="wikipedia">Big Data</a> way would be more scalable, and in some ways just as easy for small institutions (ie append only log files, periodically processed with Map Reduce if required). Alternatively, Google Analytics.</p>
+<h2>Gottchas</h2>
+<p>Before you rush off and mod_cache all your slow applications there is one fly in the ointment. To get this to work you have to separate anonymous responses from authenticated responses. You also have to perform that separation based on the request and nothing else, and you have to ensure that your cache never gets polluted, otherwise anonymous users, including a Google spider, will see authenticated responses. There is precious little in an http request that a server can influence. It can set cookies, and change the url. Applications could segment URL space based on the role of the user, but that is ugly from a URI point of view. Suddenly there are 2 URIs pointing to the same resource. Setting a cookies doesn't work, since the response that would have set the cookie is cached, hopefully without the cookie. The solution that worked for us was segment authenticated requests onto https and leave anon requests on http. Then configure the URL space used to perform authentication such that it would not be cached, and ensure an anon users never accessed https content, and an authenticated user, never accesses http content. The latter restriction ensures no authenticated content ever gets cached and the former ensures that the expected tsunami of anon users doesn't impact the management of the repository. Much though I would have liked to serve everything over a single protocol on one virtual host the approach is generally applicable to all webapps.</p>
+<p>I think the key message is, if you can host using Apache Httpd with mod_mem_cache or even the disk version, then there is no need to jump through hoops to use exotic applications stacks. My testing of Dspace 3 was done with Apache HTTPD 2.2 and all the other components running on a single 4 core box probably well past its sell by date.</p>

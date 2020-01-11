@@ -1,0 +1,28 @@
+---
+layout: post
+title: XSD2HBM
+date: 2006-06-23 01:58:52.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Thought
+tags: []
+meta:
+  _edit_last: '3991311'
+  _wpas_skip_twitter: '1'
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2006/06/23/xsd2hbm/"
+---
+<p>XPDL is a large schema (1000+ lines), I wanted to create an entity model from the schema, but I also wanted that entity model to make sense. So I looked at HyperJaxB, JaxB, Castor and number of other technologies. These are all great technologies, except for 2 things. With a complex real life schema, all tend to represent the Object model like a dom. Its not that easy to make the object model understand the xsd. For instance means a list of attributes, not an new object that implements a container that contains attributes. My second requirement is that the generated model should persist in Hibernate. This is where the JaxB like mapping technologies fall over. The bean model that is created is so complex that it looks completely mad when mapped into a database. Its almost impossible to do anything with.</p>
+<p>So in the spirit of change, I threw all the JaxB code out. Then I remembered that to get a good entity model with hibernate, with an efficient database schema, the most effective way is to edit the hbm file by hand, and work from there. But XSD is XML and so is the HBM file. A quick transform later with some annotation hints in the XSD and we have converted 1000 lines of XSD into a reasonable hbm entity model. Unlike the HyperJaxb model which contained 344 entities, this contains 36 entities.</p>
+<p>All you do, is read your xsd, annotate what you want to be sets, and specify entities to ignore, data types and lengths. Then apply the transform and you get a hbm. Plug that into Hibernate Eclipse Synchronizer and you get the Model Objects and the DAO's and away you go.</p>
+<p>The only thing this doesn't do yet, is marshall the Java model into XML and out of XML, but since I want mixed namespace, complex XML I will probably hand code the SAX. At least with 36 beans, this is managable. I would have needed JaxB for 344 beans!</p>
+<p>Attached are the current version of the transform and an example annotated schema, this is not the complete schema since that might just be confusing. You can find the xsd <a href="https://gist.github.com/1118119">here</a> and the xsl <a href="https://gist.github.com/1118117">here</a></p>

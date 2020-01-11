@@ -1,0 +1,30 @@
+---
+layout: post
+title: mvn eclipse:eclipse does some cool things
+date: 2007-05-13 12:17:51.000000000 +01:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Thought
+tags:
+- Apache Maven
+- Development Tools
+- Eclipse
+- IntelliJ IDEA
+meta:
+  _edit_last: '3991311'
+  _wpas_skip_77605: '1'
+author:
+  login: iebtfdcouk
+  email: ieb@tfd.co.uk
+  display_name: Ian
+  first_name: Ian
+  last_name: Boston
+permalink: "/2007/05/13/mvn-eclipseeclipse-does-some-cool-things/"
+---
+<p>Not having tried this much before I wasn't certain what it did exactly, but once you have fully populated pom's in you project, a quick mvn will sync all the .settings, .project and .classpath files that eclipse uses suitable for use in eclipse. The really great bits are, 1) it knows about transitive deps and adds those where necessary 2) it know about source code and if you do a mvn -DdownloadSources=true eclipse:eclipse it will download the sources, wire in the javadoc etc. It also knows about projects in the same package, referencing those directly.</p>
+<p>Potentially, if we adopted the layout structure that the plugin builds, we wouldn't need to have any .classpath, .project or .settings files in SVN, as all developers would to would be a quick mvn -DdownloadSources=true eclipse:eclipse to generate all the eclipse specific files from the pom.xml's.</p>
+<p>This would be a huge benefit reducing the work syncing the eclipse settings and allow those who want to use Idea or another supported IDE to do the equivalent.</p>
