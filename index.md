@@ -7,8 +7,8 @@ This repo contains notes and documentation mainly related to Sailing and using S
 User at Cowes Week 2018, Marks data may need adjusting for later years. See [https://github.com/ieb/cowes2018](https://github.com/ieb/cowes2018) for source code.
 
 * [Cowes Week 2018 route planner](marks/index.html)
-* [Cowes Week 2018 Marks in CSV format](marks/SolentMarksCowsWeek2018.csv)
-* [Cowes Week 2018 Marks in JSON format](marks/SolentMarksCowsWeek2018.json)
+* [Cowes Week 2018 Marks in CSV format](marks/SolentMarksCowesWeek2018.csv)
+* [Cowes Week 2018 Marks in JSON format](marks/SolentMarksCowesWeek2018.json)
 
 # Notes
 
