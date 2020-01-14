@@ -12,6 +12,7 @@ User at Cowes Week 2018, Marks data may need adjusting for later years. See [htt
 
 # Notes
 
-* [CANBus-and-NMEA200Notes](docs/CANBus-and-NMEA200Notes.md)
-* [SignalK Raspberry Pi setup](docs/SignalKRaspberryPisetup.md)
+* 65e5899 [ESP32-BLE-OnAPi](ESP32-BLE-OnAPi.md)
+* 9358ff1 [CANBus-and-NMEA200Notes](docs/CANBus-and-NMEA200Notes.md)
+* 9358ff1 [SignalK Raspberry Pi setup](docs/SignalKRaspberryPisetup.md)
 

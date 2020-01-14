@@ -20,6 +20,8 @@ There may be slight voltage differences between the Arduino USB and the Pi USB, 
 
 The Pi is a 3B because it is powerful enough and cold enough to be in a IP67 box with no fan. I may a heat transfer mechanism to extract heat from the box (ie external Au heat sinks internal and external to transfer heat out the box.)
 
+Power consumption is 350mA@12v with USB keyboard, mouse, HDMI active  running a full GUI desktop, which drops to 220mA (2.6W) when running headless. Most of the time it will run as a server, with no screen of keyboard accessed over http.
+
 # OS Confiuration
 
 * Using a quality microSD card (this time).
@@ -89,7 +91,7 @@ There have been problems with the support of the ic2 bus in node with some depen
 
 ## Bluetooth LE sensors - Work in progress
 
-Running wires through a boat is a pain. Hence I am building some ESP32 modules which are low cost, low power embedded processors with Bluetooth LE, Wifi, i2c, CAN, ADC, SPI and 2O or so GPIO pins all on a 5x3cm board for 5 GBP from ebay. Programming is via Arduino IDE (or lua, or JS). The aim will be to build a Bluetooth LE SignalK server module to take messages from these modules distributed about the boat measuring whatever they needto. If there is 12v available, they can run from 12v, if not battery+solar. Power consumption while sleeping is in the uA range and Bluetooth LE will allow the units to sleep between measurements. Thats the plan, more later.
+Running wires through a boat is a pain. Hence I am building some [ESP32 modules](https://www.espressif.com/en/products/hardware/esp32/overview) [datasheet](https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32d_esp32-wroom-32u_datasheet_en.pdf) which are low cost, low power embedded processors with Bluetooth LE, Wifi, i2c, CAN, ADC, SPI and 2O or so GPIO pins all on a 5x3cm board for 5 GBP from ebay. Programming is via Arduino IDE (or lua, or JS). The boards have  The aim will be to build a Bluetooth LE SignalK server module to take messages from these modules distributed about the boat measuring whatever they needto. If there is 12v available, they can run from 12v, if not battery+solar. Power consumption while sleeping is in the uA range and Bluetooth LE will allow the units to sleep between measurements. Thats the plan, more later.
 
 
 
