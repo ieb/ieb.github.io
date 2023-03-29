@@ -12,13 +12,13 @@ hero: ./img/2012-02-screen-shot-2012-02-27-at-07-58-07.png
 
 SparseMap is designed to maintain a shared cache of recently accessed maps in memory. The code base itself is also designed to use a little memory as possible. The SparseMap app server runs happily at load in 20MB of heap. Sakai OAE which is the main user of SparseMap uses a little more than that (around 200MB) leaving the remainder of heap available for caching. If caching is working correctly, and there is sufficient heap available for the number of active users the profile of calls to the storage layer should show almost no reads and a low level of writes. If however a mistake is made then the impact is dramatic. The first trace here shows Sakai OAE as of 2nd Feb 2012 running SparseMap 1.3 with a missconfigured cache setup. The image shows the SQL report from Neoload.
 
-[![](./img/2012/02/screen-shot-2012-02-27-at-07-58-07.png)
+[![](/img/2012/02/screen-shot-2012-02-27-at-07-58-07.png)
 
 You can see that there a colossal number of SQL statements performing a query on parent hash and there are also massive number of other queries. Obviously something is not right.
 
 Compare that with Sakai OAE on 23 Feb 2012 running SparseMap 1.5 with caching configured
 
-[![](./img/2012/02/screen-shot-2012-02-27-at-07-58-39.png)
+[![](/img/2012/02/screen-shot-2012-02-27-at-07-58-39.png)
 
 The query profile has completely changed with almost everything being served from cache in this test. The 282189 queries taking **577s** for parenthash has become 325 queries taking **0.645s** The message here is, dont deploy SparseMap without caching enabled, and check that it is enabled and sized correctly. There are periodic log statements coming from SparseMap will indicate the performance of the cache which should always be running at over 80% hit rate.
 

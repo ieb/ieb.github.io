@@ -28,4 +28,4 @@ x43543-2:osgikernel ieb$ gitk -all
 
 Which looks like this:
 
-![Tracking branches in GitK](./img/2009-04-picture-2.png "Gitk branches")
+![Tracking branches in GitK](/img/2009-04-picture-2.png "Gitk branches")

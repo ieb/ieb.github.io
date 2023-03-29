@@ -8,7 +8,7 @@ redirect_from:
 categories: "Coursera, Higher education, Sakai, Uncategorized"
 hero: ./img/wikipedia-commons-thumb-5-5e-Metro-M.svg-300px-Metro-M.svg.png
 ---
-[![Paris Metro logo Español: Logo del Metro de Pa...](./img/wikipedia-commons-thumb-5-5e-Metro-M.svg-300px-Metro-M.svg.png "Paris Metro logo Español: Logo del Metro de Pa...")](http://commons.wikipedia.org/wiki/File:Metro-M.svg)
+[![Paris Metro logo Español: Logo del Metro de Pa...](/img/wikipedia-commons-thumb-5-5e-Metro-M.svg-300px-Metro-M.svg.png "Paris Metro logo Español: Logo del Metro de Pa...")](http://commons.wikipedia.org/wiki/File:Metro-M.svg)
 
 In mid 2008 during the Sakai conference at Paris amongst the early summer european heat and the over friendly crowding of the Paris Metro I was involved in a small group of friends who had the idea that Sakai could recapture its innovative lead in Higher Education. There were representatives of commercial organisations at the conference looking nervously at our plans and taking potential customers to one side. Over the months that followed our plans grew, fueled by enquiries of what scale. The application we started building then was built so that every operation was by pointer, scaling in every operation such that the power of N was considerably less than 1. This was not done purely to satisfy the desire to serve the enquiries for collaboration communities of upto 12M users. It was done to enable one of the very early aims of the project.
 

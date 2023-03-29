@@ -12,12 +12,12 @@ For the deployment of OAE at Cambridge we needed and easy way which institutions
 
 The following sequence of screenshots shows a Sakai Doc being created in a Group, then the inline content widget being added and configured to inline the Lecture information in question.
 
-![](./img/2011/08/screen-shot-2011-08-09-at-18-38-03.png)
+![](/img/2011/08/screen-shot-2011-08-09-at-18-38-03.png)
 
-![](./img/2011/08/screen-shot-2011-08-09-at-18-38-22.png)
+![](/img/2011/08/screen-shot-2011-08-09-at-18-38-22.png)
 
-![](./img/2011/08/screen-shot-2011-08-09-at-18-38-35.png)
+![](/img/2011/08/screen-shot-2011-08-09-at-18-38-35.png)
 
-![](./img/2011/08/screen-shot-2011-08-09-at-18-39-02.png)
+![](/img/2011/08/screen-shot-2011-08-09-at-18-39-02.png)
 
-![](./img/2011/08/screen-shot-2011-08-09-at-18-39-09.png)
+![](/img/2011/08/screen-shot-2011-08-09-at-18-39-09.png)

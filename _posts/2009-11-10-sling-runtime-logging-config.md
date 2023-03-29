@@ -12,14 +12,14 @@ One of the most annoying things about bug hunting in open source, is that you ca
 
 Go to the admin console, select the configuration tab.
 
-![Picture 6](./img/2009-11-picture-6.png "Picture 6")
+![Picture 6](/img/2009-11-picture-6.png "Picture 6")
 
 Select from the Configuration Factories drop down the logging.config Factory,
 
-![Picture 7](./img/2009-11-picture-7.png "Picture 7")
+![Picture 7](/img/2009-11-picture-7.png "Picture 7")
 
 Set the properties including the package or class that you want this logging config to apply to, and save.
 
-![Picture 8](./img/2009-11-picture-8.png "Picture 8")
+![Picture 8](/img/2009-11-picture-8.png "Picture 8")
 
 As I mentioned, you can do all of this on a running instance, no need to shutdown.

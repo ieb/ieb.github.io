@@ -8,7 +8,7 @@ redirect_from:
 categories: "Apache Cassandra, Cassandra, Distributed computing, Fibonacci, Fibonacci number, Linear Congruential Generator, Uncategorized, Vi Hart"
 hero: ./img/wikipedia-commons-thumb-d-d0-Protea_flower.jpg-300px-Protea_flower.jpg
 ---
-![King Protea (Protea cynaroides)](./img/wikipedia-commons-thumb-d-d0-Protea_flower.jpg-300px-Protea_flower.jpg "King Protea (Protea cynaroides)")
+![King Protea (Protea cynaroides)](/img/wikipedia-commons-thumb-d-d0-Protea_flower.jpg-300px-Protea_flower.jpg "King Protea (Protea cynaroides)")
 
 No this isn't a greek tragedy or some software that I have written, but a thought about the way in which Apache Cassandra an other distributed systems perform problem space decomposition. Cassandra is a good example of a distributed system with problem space decomposition. Its problem space is keys. To be efficient it needs to distribute those keys evenly around its cluster. The key partitioning algorithm normally uses something that generates a flat even distribution. A [Linear Congruential Generator](http://en.wikipedia.org/wiki/Linear_congruential_generator) could be used if you are prepared to live with some banding in the problem space. If not and you are prepared to live with a bit more computational expense one of the hash functions like MD5 or SHAx. In fact the standard key distribution functions in Cassandra use something based on MD5, which to my naive mind must have some collisions.
 

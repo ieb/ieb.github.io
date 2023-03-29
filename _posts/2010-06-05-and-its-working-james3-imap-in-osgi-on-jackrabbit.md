@@ -10,4 +10,4 @@ hero: ./img/2010-06-screen-shot-2010-06-05-at-07-29-34.png
 ---
 A Self contained James OSGi bundle containing a DNS Server and an IMAP server, binding down to a Sling repository. The screenshot is of OSX iMail connection doctor checking the imap connection and running some simple tests.
 
-[![](./img/2010-06-screen-shot-2010-06-05-at-07-29-34.png "Screen shot 2010-06-05 at 07.29.34")](./img/2010/06/screen-shot-2010-06-05-at-07-29-34.png))
+[![](/img/2010-06-screen-shot-2010-06-05-at-07-29-34.png "Screen shot 2010-06-05 at 07.29.34")](/img/2010/06/screen-shot-2010-06-05-at-07-29-34.png))
