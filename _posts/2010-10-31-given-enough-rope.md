@@ -30,11 +30,11 @@ of the target node.
 
 So I loaded an instance with upto 6K user-home nodes, and then loaded with 6K non user-home nodes and did some experiments, graph below.
 
-[![](http://ianboston.files.wordpress.com/2010/10/searchanalysis1.png "SearchAnalysis1")](./img/2010-10-searchanalysis1.png)
+[![](./img/2010/10/searchanalysis1.png)
 
-[![](http://ianboston.files.wordpress.com/2010/10/searchanalysis2.png "SearchAnalysis2")](./img/2010-10-searchanalysis2.png)
+[![](./img/2010/10/searchanalysis2.png)
 
-[![](http://ianboston.files.wordpress.com/2010/10/searchanalysis3.png "SearchAnalysis3")](./img/2010-10-searchanalysis3.png)
+[![](./img/2010/10/searchanalysis3.png)
 
 Pretty clear that the search based on child node does not scale at all and is not concurrent. Further investigation reveals that the sort operation has to load the child nodes inside the Lucene scorer direct from the JCR. with ACLs this is about 120K nodes. With > 1K nodes the LRU caches inside Jackrabbit are overloaded and none of the fetches are from cache, which is the underlying cause of the concurrency issue. In JR 2.1.1 the Persistence Manager is synchronized and so loads are sequential in the JVM. 4 threads all have to wait for one another to load the same data from the DB. Why this code was ever sequential I cant quite see, presumably because a non JDBC Persistence manager might need to be synchronized.
 

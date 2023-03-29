@@ -10,15 +10,15 @@ hero: ./img/2010-06-screen-shot-2010-06-21-at-10-16-59.png
 ---
 Here is a classic example of new not being better. My utilities provider has a "new and improved interface", so much improved that they felt it necessary to tell their customers how much better it was.
 
-[![](./img/2010-06-screen-shot-2010-06-21-at-10-16-59.png "ImprovedMessage")](http://ianboston.files.wordpress.com/2010/06/screen-shot-2010-06-21-at-10-16-59.png)
+[![](./img/2010-06-screen-shot-2010-06-21-at-10-16-59.png "ImprovedMessage")](./img/2010/06/screen-shot-2010-06-21-at-10-16-59.png))
 
 If you click on the "Continue" button you find out just how much better it is
 
-[![](./img/2010-06-screen-shot-2010-06-21-at-10-16-40.png "Screen shot 2010-06-21 at 10.16.40")](http://ianboston.files.wordpress.com/2010/06/screen-shot-2010-06-21-at-10-16-40.png)
+[![](./img/2010-06-screen-shot-2010-06-21-at-10-16-40.png "Screen shot 2010-06-21 at 10.16.40")](./img/2010/06/screen-shot-2010-06-21-at-10-16-40.png))
 
 Hey, fantastic, I can request a call back! But if I press the browser back button, I find the "new and improved site" is even better.
 
-[![](./img/2010-06-screen-shot-2010-06-21-at-10-17-13.png "Screen shot 2010-06-21 at 10.17.13")](http://ianboston.files.wordpress.com/2010/06/screen-shot-2010-06-21-at-10-17-13.png)
+[![](./img/2010-06-screen-shot-2010-06-21-at-10-17-13.png "Screen shot 2010-06-21 at 10.17.13")](./img/2010/06/screen-shot-2010-06-21-at-10-17-13.png))
 
 I feel so reassured by Katie's smile, I really feel I should ask her for help.
 
