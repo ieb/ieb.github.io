@@ -1,0 +1,27 @@
+---
+layout: post
+title: 'Massively Online'
+description: ""
+date: Wed Aug 22 2012 07:47:32 GMT+0100 (British Summer Time)
+redirect_from: 
+            - http://blog.tfd.co.uk/2012/08/22/massively-online/
+categories: "Coursera, Higher education, Sakai, Uncategorized"
+hero: ./img/wikipedia-commons-thumb-5-5e-Metro-M.svg-300px-Metro-M.svg.png
+---
+[![Paris Metro logo Español: Logo del Metro de Pa...](./img/wikipedia-commons-thumb-5-5e-Metro-M.svg-300px-Metro-M.svg.png "Paris Metro logo Español: Logo del Metro de Pa...")](http://commons.wikipedia.org/wiki/File:Metro-M.svg)
+
+In mid 2008 during the Sakai conference at Paris amongst the early summer european heat and the over friendly crowding of the Paris Metro I was involved in a small group of friends who had the idea that Sakai could recapture its innovative lead in Higher Education. There were representatives of commercial organisations at the conference looking nervously at our plans and taking potential customers to one side. Over the months that followed our plans grew, fueled by enquiries of what scale. The application we started building then was built so that every operation was by pointer, scaling in every operation such that the power of N was considerably less than 1. This was not done purely to satisfy the desire to serve the enquiries for collaboration communities of upto 12M users. It was done to enable one of the very early aims of the project.
+
+There is a iTunesU lecture from Stanford that I remember watching on an iPod travelling through the suburbs of Chicago in a taxi on the way to the airport. It told the story of medical device company (a case study) where a new CEO wanted to drive the bottom line throughout the entire organisation. Monthly reports were created based on current months data, unheard of in the company, and where headings could not be filled the words "Insufficient Data" were placed. This so incensed the readers of these reports that soon every line was filled. Had blanks been left, perhaps human curiosity would not have taken over. Most of us dislike the unknown and attempt to fill it with information.
+
+Earlier that year Google had announced OpenSocial. A standard intended to make it easier for developers to build applications that integrated with a social network, perhaps an answer to Facebook's App environment. The underlying motivations for this initiative was not really to pander to developers but rather to increase the quality, volume and hence value of the data that Google was able to collect on its product, you and me, or rather what we find relevant.
+
+In 2008, I wanted to do two things. Make Sakai easier for developers to develop for, and make it a suitable platform for running at massive scale, not for the sake of scale but for the sake of collecting data, big data, from which to make informed decisions about the actions we take in Higher Education. Those actions don't inform or drive purchase decisions, they inform and drive whole lifetimes of achievement. Saving a drop out student, creating a cancer researcher changes lives.
+
+That was 2008. In 2009 presented a keynote speech at North Sidney Institute for the AuSakai conference. Although the speech was poorly delivered, the message had developed having attended and listened to Hadoop/Pig/Mahout sessions at Apache conferences. Higher Ed needed to learn from the analytics and data analysis being employed in the wider web. Our data was far richer in metadata than a marketing web site and failing to put the infrastructure in place to collect that rich metadata without reduction would put Higher Ed at a disadvantage.
+
+Fast forward to today. The organisations that approached me with requirements for scale have moved on. One group, MIT and Harvard has formed edX, delivering courses at massive scale, collecting data and using the results to mark, learn and improve. Other groups went internal with development and new comers like Coursera have exploded on to the scene delivering the scale and insight that Sakai 3 was being built to deliver.
+
+With the benefit of hindsight I can see the differentiator. Sakai 3, now Sakai OAE tried to solve the use case of content authoring for course delivery to small groups teaching. Analytics becomes irrelevant in that environment, and the application is incapable of making the compromises necessary to be adapted for scale. Like pushing a bolder up a hill. Contrast that to the workflow of Corsera and edX. The bolder is already at the top of the hill. Massive scale makes the business model work and so content authoring and creation can take on a wholly different nature. The problems to be solved are that of huge numbers of users interacting with a small number of courses, not of thousands of users and thousands of courses all interacting with each other in random ways.
+
+The future. I suspect the quality and precision of teaching, backed by analytics and evidence that world class materials can deliver through the edX and Coursera platforms will make those platforms the new Google of education. Just as no small online advertising platform can compete in generalist online ad placement against Google, the platforms that don't have the ability to collect data and use it appropriately will become irrelevant. I can't tell who will win this the race to grab this new land, sadly I think what I started in 2008 never got out the blocks in this race.
