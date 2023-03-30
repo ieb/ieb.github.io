@@ -12,4 +12,4 @@ hero: ./img/2009-02-picture-3-300x288.png
 
 See attached from yourkit of the startup,
 
-![picture-3-300x288](/img/2009-02-picture-3-300x288.png "picture-3-300x288")
+![picture-3-300x288](https://ik.imagekit.io/htj4bin8p/2009-02-picture-3-300x288.png "picture-3-300x288")

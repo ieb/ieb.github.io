@@ -36,4 +36,4 @@ One of the other issues that appeared was that with more than one queue, sharing
 
 The work doen at CSU will make it into the Solr bundle in the 1.3 release, and any changes that were made to the core code will undoubtedly make it into the managed project code base. A selection of lead developers from the managed project have access to the CSU private repository.
 
-[![](/img/2011/11/csucluster.png)
+[![](https://ik.imagekit.io/htj4bin8p/2011/11/csucluster.png)

@@ -20,11 +20,11 @@ My new instruments are Raymarine, a few heads and sensors, a chart plotter and a
 
 I mentioned power earlier. The setup runs on the Pi Zero W with a load average of below 1 the board consuming about 200mA (5V). The Arduino Due consumes around 80mA@5V most of the time. There are probably some optimisations on to IO that can be performed in InfluxDB to minimize the power consumption further. Details of setup are in <https://github.com/ieb/nmea2000>. An example dashboard showing apparent wind and boat speed from a test dataset. This is taken from the Pi Zero W.
 
-![GrafanaAparentWind](/img/2017-04-grafanaaparentwind.png)
+![GrafanaAparentWind](https://ik.imagekit.io/htj4bin8p/2017-04-grafanaaparentwind.png)
 
 Remember those expensive race processors. The marketing documentation talks of multiple ARM processors. The Pi Zero W has 1 ARM and the Arduino Due has another. Programmed in C++ the Arduino has ample spare cycles to do interesting things. On sailing boats, performance is predicted by the designer and through experience presented in a polar performance plot.
 
-![Pogo1250Polar](/img/2017-04-pogo1250polar.png)
+![Pogo1250Polar](https://ik.imagekit.io/htj4bin8p/2017-04-pogo1250polar.png)
 
 A polar plot showing expected boat speed for varying true wind angles and speeds. Its a 3D surface. Interpolating that surface of points using bilinear surface interpolation is relatively cheap on the ARM giving me real time target boat speed and real time % performance at a rate of well above 25Hz. Unfortunately the sensors do not produce data at 25Hz, but the electrical protocol is simple. Boat speed is presented as pulses at 5.5Hz per kn and wind speed as 1.045Hz per kn. Wind angle is a sine cosine pair centered on 4V with a max of 6V and a min of 2V. Converting that all that to AWA, AWS and STW is relatively simple. That data is uncorrected. Observing the Raymarine messages with simulated electrical data I found its data is also uncorrected, as the Autopilot outputs Attitude information, ignored by the wind device. I think I can do better. There are plenty of 9DOF sensors (see Sparkfun) available speaking i2c that are easy to attach to an Arduino. Easy, because SparkFun/Adafruit and others have written C++ libraries. 3D Gyro and 3D Acceleration will allow me to correct the wind instrument for wind shear, heal and mast head velocity (the mast is 18m tall, cup anemometers have non linear errors wrt angle of heel). There are several published papers detailing the nature of these errors. I should have enough spare cycles to do this at 25Hz, to clean the sensors and provide some reliable KPIs to hit while at sea.
 

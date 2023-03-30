@@ -16,17 +16,17 @@ The problem with MySQL is that there is a limit to the number of colums you can 
 
 Insert performance degrades on MySQL as the number of rows increases. That degradation is worse fo text fields than varchar fields, but it hardly matters since at 50ms per insert Sakai OAE is going to be unusable on MySQL, as each update operation needs 10s or perhaps 100s of updates to content objects.. Earlier tests showed that there was no difference between KV indexing and wide column indexing with MySQL as the problem was simply transposed. PostgreSQL shows the insert time constant with number of rows. Its impossible to see what that time is from the graph but the inserts between 99000 and 99500 averaged 1.3 ms per row. Its perfectly possible that the degradation in MySQL inserts is due to a fundamental mistake in the table structure, and that will need to be investigated some more, but as it stands insert time is an issue.
 
-[![](/img/2011/09/screen-shot-2011-09-23-at-13-12-29.png)
+[![](https://ik.imagekit.io/htj4bin8p/2011/09/screen-shot-2011-09-23-at-13-12-29.png)
 
 ## Query Performance
 
 Query performance was tested on 100K rows after the inserts were completed. A range of queries were performed starting with single select term, no sorting (Q1) through to 5 select terms 2 sorts (Q5S2). The results show that text based columns impact query time significantly, probably because temporary tables are placed on disk, and perhaps the sorts are disk sorts. Its clear that Wide Text columns are not viable as a indexing approach with queries averaging at 1s. Since the average page load in Sakai OAE might need 10-20 of these queries it would probably take between 30 and 40s to load each page. Clearly a non starter.
 
-[![](/img/2011/09/screen-shot-2011-09-23-at-13-31-59.png)
+[![](https://ik.imagekit.io/htj4bin8p/2011/09/screen-shot-2011-09-23-at-13-31-59.png)
 
 Removing the MySQL Wide Text columns from the graph we see that apart from some query start up times MySQL queries are averaging 25-30ms per query and PostgreSQL are sub 5ms per query. Its not clear if the MySQL query cache would make a big difference since the table in question has a high update rate, and I suspect that any query cache would be constantly invalidated.
 
-[![](/img/2011/09/screen-shot-2011-09-23-at-13-32-22.png)
+[![](https://ik.imagekit.io/htj4bin8p/2011/09/screen-shot-2011-09-23-at-13-32-22.png)
 
 As I said, I dislike comparative tests between DB vendors since its almost impossible to compare like with like. However in this test readers should take the PosgreSQL line as what might be an acceptable response and use that to evaluate if the MySQL lines are acceptable. The lines might be changed by version or configuration. I used MySQL 5.1, with a large configuration, and PostgreSQL 9.0 with an out of the box configuration. In all cases the DB instances were empty and performing no other work.
 
