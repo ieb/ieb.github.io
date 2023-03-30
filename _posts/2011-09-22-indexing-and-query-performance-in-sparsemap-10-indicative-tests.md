@@ -26,4 +26,4 @@ Long Term:
 - Don't rely on indexing as a substitute for publishing data in the right form for 99% of the queries (ie write exactly what you want to read once, and read it billions of times). Although the MySQL query cache does a good job of caching query results, in a situation where there is a high write traffic, the cache gets invalidated regularly.
 - Dont think that inverted indexes will eliminate the problem. All have latency or cardinallity issues and most have clustering issues which is why anyone running at scale in a cluster always puts a quality of service or data delivery parameter on data being written to data appearing in the index. There is plenty of material on this subject on the devops blogs at places like LinkedIn or Facebook.
 
-[![](/img/2011/09/derby-query.png)
+[![](https://ik.imagekit.io/htj4bin8p/2011/09/derby-query.png)

@@ -8,7 +8,7 @@ redirect_from:
 categories: "Apache Solr, ElasticSearch, Lucene, Solr, Tony Hoare, Uncategorized"
 hero: ./img/2012-10-screen-shot-2012-10-11-at-17-48-24.png
 ---
-[![](/img/2012-10-screen-shot-2012-10-11-at-17-48-24.png "Screen shot 2012-10-11 at 17.48.24")](/img/2012/10/screen-shot-2012-10-11-at-17-48-24.png)A)
+[![](https://ik.imagekit.io/htj4bin8p/2012-10-screen-shot-2012-10-11-at-17-48-24.png "Screen shot 2012-10-11 at 17.48.24")](https://ik.imagekit.io/htj4bin8p/2012/10/screen-shot-2012-10-11-at-17-48-24.png)A)
 
 For those wanting to try Sakai CLE with Apache Solr as the search server then look no further than the work that Adam Marshall has been doing at Oxford University. That allows you to spin up a Solr instance and connect your Sakai CLE instances to it. You will have to do some reasonably sophisticated master slave configuration to make it resilient to failures and don't expect the indexing operations to be real-time. There are plenty of references to the work required to do that in this blog, and arguments why I currently prefer ElasticSearch over Solr.
 

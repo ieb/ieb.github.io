@@ -10,7 +10,7 @@ hero: ./img/2011-01-screen-shot-2011-01-04-at-13-53-06.png
 ---
 Finally I feel like I am getting somewhere.
 
-[![](/img/2011/01/screen-shot-2011-01-04-at-13-53-06.png)
+[![](https://ik.imagekit.io/htj4bin8p/2011/01/screen-shot-2011-01-04-at-13-53-06.png)
 
 This is JConsole showing Heap, half way though a load test uploading pooled content. There are 20 threads hitting the server from JMeter with no pauses uploading files from 50K down to 1K in size. JMeter is reporting throughput of between 75 and 108 files per second depending on if I have the Terminal window with the log flying past open and JMeter GUI open. This is using the sparse sessions I mentioned earlier, with shallow sizes around 80 bytes (deep about 1K) and JDBC connections bound to threads, which is probably why the heap is static and flat around 100MB. The X axis is time of day.
 
