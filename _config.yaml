@@ -4,3 +4,5 @@ author:
   name: Ian
 description: "TFD Blog and pages."
 theme: minima
+show_excerpts: true
+google_analytics: G-8EPQRLSP7R
