@@ -1,8 +1,0 @@
----
----
-
-@import "{{ site.theme }}";
-
-main testing {
-  border: solid 1px red;
-}
