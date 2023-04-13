@@ -1,0 +1,365 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" >
+    <title>Mini Lathe Gear Calculator</title>
+    <style type="text/css">
+      .inputs {
+        width: 50%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+
+      }
+      #result {
+        margin: 1rem;
+      }
+      #result table {
+        margin: 1rem;
+      }
+      #result td {
+        border: 1px solid;
+        padding: 1rem;
+      }
+    </style>
+   </head>
+<body>
+
+<h1>Lathe Gear Layouts for cutting screws</h1>
+<p>
+  This is mostly intended for a 8x16 mini lathe that has a fixed headstock gear of 56 teeth. Other min Lathe gear calculators
+  on line assume that the headstock gear can be changed to anything. On a 8x16 it cant, which is why this page exists.
+</p>
+<p>
+Gears on the same row are joined. h means a hub connected to the gear on the row but no other.
+G is the headstock gear (56 on a 8x16, cant be changed).
+</p>
+<p>
+Set the leadscrew pitch (2mm on a 8x16), the desired pitch, the head gear (G) teeth, and the available gears.
+Press calculate and a list of options will be found, with the closest match first. These will in in one of the 4 layouts.
+Try and select a set of gears where the ratio between gears is as close to 1 as possible to avoid over stressing the gear 
+train.  All code is on this page.
+</p><p>
+If you have 2 gears of the same size, then list both gears in the available gears list. The code will assume it can only 
+use a physical gear once in the layout.
+</p>
+<p>
+  Not all gear combinations will fit. They must have centers less than the mounting which is the distance between centers for A and the leadscrew. And the total distance betwene centers must be greater than the headstock to leadscrew center for the years to be able mesh at all. On a 8x16 the maximum A to leadscrew center measurment is 130mm, and the minimum headsctock to leadscrew measurement is 170mm.  Results that dont meet these criteria are not show.
+</p>
+
+
+<div class="inputs">
+<label for="leadScrew">LeadScrew Pitch:</label><input type="number" name="leadScrew" value="2">
+<label for="targetPitch">Desired Pitch:</label> <input type="number" name="targetPitch" value="3.5">
+<label for="head-gear">Head Gear:</label> <input type="number" name="head-gear" value="56">
+<label for="gears">Available Gears:</label> <input type="text" name="gears" value="30,33,40,50,52,60,66,72,80,84">
+<label for="gearpitch">Gear Pitch:</label> <input type="number" name="gearpitch" value="3.13">
+<label for="headlead">Distance been headstock and leadscrew centers:</label> <input type="number" name="headlead" value="170">
+<label for="alead">Distance been A and leadscrew centers:</label> <input type="number" name="alead" value="130">
+</div>
+<button id="calculate" >Calculate</button>
+<div id="result">
+</div>
+  
+
+<h2>Layouts</h2>
+
+<pre>    
+
+Short form
+==G,A-B,D,F--- Headstock (===) gear G meshes (,) with A connected (-) to  B meshes (,) with D meshes (,) with F connected to leadscrew (---)
+
+Long Form
+==G   <--- headstock input
+  A-B  <--- A and B are on the same shaft conected together.
+  C-D  <-- B meshes with D, or A with C, but never both at the same time. a h indicates a hub with no gear teath.
+  E-F ----   <--- leadscrew output
+
+Layout 1          Layout 2         Layout 3           Layout 4
+==G,A-B,D,F---    ==G,A,C-D,F---   ==G,A-B,D-C,E---   ==G,A,C,E---
+==G               ==G              ==G                ==G
+  A-B               A-h              A-B                A-h
+  h D               C-D              C-D                C-h
+    F---            h-F---           E-h---             E-h---
+</pre>
+
+<script>
+/*
+This laith has a 56 tooth headstock gear which cant be changed.
+Beyond that it can accomidate gears setup 
+
+A  B
+C  D
+E  F
+
+Where 56 is the headstock, A-B, C-D, E-F are on the same shaft with E-F being the lead screw.
+Possible combinations
+
+A-B,D,F=   (56/A)*(B/F)
+A,C-D,F=   (56/C)*(D/F)
+A-B,D-C,E= (56/A)*(B/D)*(C/E)
+A,C,E=     (56/E)
+
+every gear can be in every location
+
+*/
+
+/**
+ * A-B,D,F=   (56/A)*(B/F)
+ */
+function calcRatios1(headGear, requestedRatio, gears, gearpitch, headLead, aGearlead) {
+  let results = [];
+  for (let a=0; a < gears.length; a++) {
+    for (let b=0; b < gears.length; b++) {
+      if ( b != a) {
+        for (let d=0; d < gears.length; d++) {
+          if ( d != a && d != b) {
+            for (let f=0; f < gears.length; f++) {
+              if ( f != a && f != b && f != d) {
+                const ratio = (headGear/gears[a])*(gears[b]/gears[f]);
+                const error = (ratio-requestedRatio)/requestedRatio;
+                const aLeadDistance = gearpitch*(gears[b]+2*gears[d]+gears[f])/(2*Math.PI);
+                const headLeadDistance = aLeadDistance+gearpitch*(headGear+gears[a])/(2*Math.PI);
+                if ( Math.abs(error) < 0.05 && (headLeadDistance > headLead) && (aLeadDistance < aGearlead)) {
+                  results.push({
+                    ratio: ratio,
+                    layout: 1,
+                    a: gears[a],
+                    b: gears[b],
+                    d: gears[d],
+                    f: gears[f], 
+                    error: error,
+                    headLeadDistance: headLeadDistance,
+                    aLeadDistance: aLeadDistance,
+                    tooShort: (headLeadDistance < headLead),
+                    tooLong: (aLeadDistance > aGearlead)
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return results;
+}
+/**
+ * A,C-D,F=   (56/C)*(D/F)
+ */
+  //
+
+function calcRatios2(headGear, requestedRatio, gears, gearpitch, headLead, aGearlead) {
+  let results = [];
+  for (let a=0; a < gears.length; a++) {
+    for (let c=0; c < gears.length; c++) {
+      if ( c != a) {
+        for (let d=0; d < gears.length; d++) {
+          if ( d != a && d != c) {
+            for (let f=0; f < gears.length; f++) {
+              if ( f != a && f != c && f != d) {
+                const ratio = (headGear/gears[c])*(gears[d]/gears[f]);
+                const error = (ratio-requestedRatio)/requestedRatio;
+                const aLeadDistance = gearpitch*(gears[a]+gears[c]+gears[d]+gears[f])/(2*Math.PI);
+                const headLeadDistance = aLeadDistance+gearpitch*(headGear+gears[a])/(2*Math.PI);
+                if ( Math.abs(error) < 0.05 && (headLeadDistance > headLead) && (aLeadDistance < aGearlead)) {
+                  results.push({
+                    ratio: ratio,
+                    layout: 2,
+                    a: gears[a],
+                    c: gears[c],
+                    d: gears[d],
+                    f: gears[f], 
+                    error: error,
+                    headLeadDistance: headLeadDistance,
+                    aLeadDistance: aLeadDistance
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return results;
+}
+
+/**
+ * A-B,D-C,E= (56/A)*(B/D)*(C/E)
+ */
+function calcRatios3(headGear, requestedRatio, gears, gearpitch, headLead, aGearlead) {
+  let results = [];
+  for (let a=0; a < gears.length; a++) {
+    for (let b=0; b < gears.length; b++) {
+      if ( b != a) {
+        for (let c=0; c < gears.length; c++) {
+          if ( c != a && c != b ) {
+            for (let d=0; d < gears.length; d++) {
+              if ( d != a && d != b && d != c) {
+                for (let e=0; e < gears.length; e++) {
+                  if ( e != a && e != b && e != c && e != d) {
+                    const ratio =  (headGear/gears[a])*(gears[b]/gears[d])*(gears[c]/gears[e]);
+                    const error = (ratio-requestedRatio)/requestedRatio;
+                    const aLeadDistance = gearpitch*(gears[b]+gears[d]+gears[c]+gears[e])/(2*Math.PI);
+                    const headLeadDistance = aLeadDistance+gearpitch*(headGear+gears[a])/(2*Math.PI);
+
+                    if ( Math.abs(error) < 0.05 && (headLeadDistance > headLead) && (aLeadDistance < aGearlead)) {
+                        results.push({
+                          ratio: ratio,
+                          layout: 3,
+                          a: gears[a],
+                          b: gears[b],
+                          c: gears[c],
+                          d: gears[d],
+                          e: gears[e], 
+                          error: error,
+                          headLeadDistance: headLeadDistance,
+                          aLeadDistance: aLeadDistance
+
+                        });
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return results;
+}
+
+/**
+ * A,C,E=     (56/E)
+ */
+function calcRatios4(headGear, requestedRatio, gears, gearpitch, headLead, aGearlead) {
+  let results = [];
+  for (let a=0; a < gears.length; a++) {
+    for (let c=0; c < gears.length; c++) {
+      if ( c != a) {
+        for (let e=0; e < gears.length; e++) {
+          if ( e != a && e != c) {
+            const ratio = (headGear/gears[e]);
+            const error = (ratio-requestedRatio)/requestedRatio;
+            const aLeadDistance = gearpitch*(gears[a]+2*gears[c]+gears[e])/(2*Math.PI);
+            const headLeadDistance = aLeadDistance+gearpitch*(headGear+gears[a])/(2*Math.PI);
+            if ( Math.abs(error) < 0.05 && (headLeadDistance > headLead) && (aLeadDistance < aGearlead)) {
+              results.push({
+                ratio: ratio ,
+                layout: 4,
+                a: gears[a],
+                c: gears[c],
+                e: gears[e], 
+                error: error,
+                headLeadDistance: headLeadDistance,
+                aLeadDistance: aLeadDistance,
+                tooShort: (headLeadDistance < headLead),
+                tooLong: (aLeadDistance > aGearlead)
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+  return results;
+}
+
+function createRow(arr,def) {
+  const tr = document.createElement("tr");
+  [...arr].forEach((v) => {
+    const td = document.createElement("td");
+    td.innerHTML = v?v:def;
+    tr.append(td);
+  });
+  return tr;
+}
+function addItem(txt) {
+  const li = document.createElement('li');
+  li.innerHTML = txt;
+  return li;
+}
+function updateDisplay(el, ratio ) {
+
+  el.innerHTML = "";
+  const table = document.createElement("table");
+  table.append(createRow([ratio.a, ratio.b],'h'));
+  table.append(createRow([ratio.c, ratio.d],'h'));
+  table.append(createRow([ratio.e, ratio.f],'h'));
+  el.append(table);
+
+/*
+  const ul = document.createElement("ul");
+  ul.append(addItem(`pitch: ${ratio.pitch}`));
+  ul.append(addItem(`error: ${ratio.error}`));
+  ul.append(addItem(`ratio: ${ratio.ratio}`));
+  el.append(ul);
+  */
+
+  
+
+}
+
+const leadScrewIn = document.querySelector('[name="leadScrew"]');
+const targetPitchIn = document.querySelector('[name="targetPitch"]');
+const headGearIn = document.querySelector('[name="head-gear"]');
+const availableGearsIn = document.querySelector('[name="gears"]');
+const resultOut = document.querySelector('#result');
+const gearpitchIn = document.querySelector('[name="gearpitch"]');
+const headLeadIn = document.querySelector('[name="headlead"]');
+const aGearleadIn = document.querySelector('[name="alead"]');
+
+ document.querySelector('#calculate')?.addEventListener("click", (e) => {
+    const gears = availableGearsIn.value.split(",").map((e) => { return +e});
+    const headGear = +headGearIn.value;
+    const leadScrew = +leadScrewIn.value;
+    const targetPitch = +targetPitchIn.value;
+    const requestedRatio = targetPitch/leadScrew;
+    const gearpitch = +gearpitchIn.value;  
+    const headLead = +headLeadIn.value;  
+    const aGearlead = +aGearleadIn.value;
+
+
+    console.log("Gears ", gears);
+    console.log("headGearTeeth ", headGear);
+    console.log("Ratio required ", requestedRatio);
+    console.log("Gear Pitch ", gearpitch);
+    console.log("headLead ", headLead);
+    console.log("aGearlead ", aGearlead);
+    const ratios1 = calcRatios1(headGear, requestedRatio, gears, gearpitch, headLead, aGearlead);
+    const ratios2 = calcRatios2(headGear, requestedRatio, gears, gearpitch, headLead, aGearlead);
+    const ratios3 = calcRatios3(headGear, requestedRatio, gears, gearpitch, headLead, aGearlead);
+    const ratios4 = calcRatios4(headGear, requestedRatio, gears, gearpitch, headLead, aGearlead);
+    const allRatios = ratios1.concat(ratios2,ratios3,ratios4);
+    allRatios.sort((a,b) => { return Math.abs(a.error) - Math.abs(b.error)});
+
+
+    const select = document.createElement("select");
+    [...allRatios].forEach((r) => {
+      r.pitch = leadScrew*r.ratio;
+      const option = document.createElement("option");
+      option.innerHTML = `layout: ${r.layout} pitch: ${r.pitch} error: ${r.error*100}%`;
+      option.setAttribute("ratio",JSON.stringify(r));
+      select.append(option);
+    });
+    resultOut.innerHTML = "";
+    const ratioDisplay = document.createElement("div");
+    resultOut.append(select);
+    resultOut.append(ratioDisplay);
+    updateDisplay(ratioDisplay, allRatios[0]);
+
+    select.addEventListener("change", (e) => {
+      const ratio = JSON.parse(e.target.selectedOptions[0].getAttribute("ratio"));
+      updateDisplay(ratioDisplay, ratio);
+    });
+
+
+
+
+});
+
+</script>
+</body>
+</html>

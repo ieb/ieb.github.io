@@ -22,3 +22,4 @@ User at Cowes Week 2018, Marks data may need adjusting for later years. See [htt
 * 9358ff1 [CANBus-and-NMEA200Notes](docs/CANBus-and-NMEA200Notes.md)
 * 9358ff1 [SignalK Raspberry Pi setup](docs/SignalKRaspberryPisetup.md)
 
+* [mini Lathe thread cutting gear calculator](laith8x16gears.html)
