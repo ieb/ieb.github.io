@@ -44,7 +44,7 @@ If you have 2 gears of the same size, then list both gears in the available gear
 use a physical gear once in the layout.
 </p>
 <p>
-  Not all gear combinations will fit. They must have centers less than the mounting which is the distance between centers for A and the leadscrew. And the total distance betwene centers must be greater than the headstock to leadscrew center for the years to be able mesh at all. On a 8x16 the maximum A to leadscrew center measurment is 130mm, and the minimum headsctock to leadscrew measurement is 170mm.  Results that dont meet these criteria are not show.
+  Not all gear combinations will fit. They must have centers less than the mounting which is the distance between centers for A and the leadscrew. And the total distance betwene centers must be greater than the headstock to leadscrew center for the years to be able mesh at all. On a 8x16 the maximum A to leadscrew center measurment is 130mm, and the minimum headsctock to leadscrew measurement is 170mm.  In addtion layout 1, gear B must have clearance with the headstock gear and in layout3 gear A must have clearance with gear C. A quick check is to add up the number of teeth in a pair, the smaller sum will mesh. Results that dont meet these criteria are not show. 
 </p>
 
 
@@ -106,6 +106,10 @@ every gear can be in every location
 
 /**
  * A-B,D,F=   (56/A)*(B/F)
+ * 
+ * A-B
+ * h-D
+ * h-F
  */
 function calcRatios1(headGear, requestedRatio, gears, gearpitch, headLead, aGearlead) {
   let results = [];
@@ -120,7 +124,15 @@ function calcRatios1(headGear, requestedRatio, gears, gearpitch, headLead, aGear
                 const error = (ratio-requestedRatio)/requestedRatio;
                 const aLeadDistance = gearpitch*(gears[b]+2*gears[d]+gears[f])/(2*Math.PI);
                 const headLeadDistance = aLeadDistance+gearpitch*(headGear+gears[a])/(2*Math.PI);
-                if ( Math.abs(error) < 0.05 && (headLeadDistance > headLead) && (aLeadDistance < aGearlead)) {
+                const clearance =  (gearpitch*gears[a]/(2*Math.PI))-(gearpitch*gears[b]/(2*Math.PI));
+
+                // B has to be < A to avoid a collision
+                if ( Math.abs(error) < 0.05 
+                    && (headLeadDistance > headLead) 
+                    && (aLeadDistance < aGearlead)
+                    && gears[b] < gears[a] 
+                    && clearance > 2*gearpitch)  // b must not mesh with the head gear
+                {
                   results.push({
                     ratio: ratio,
                     layout: 1,
@@ -162,6 +174,7 @@ function calcRatios2(headGear, requestedRatio, gears, gearpitch, headLead, aGear
                 const error = (ratio-requestedRatio)/requestedRatio;
                 const aLeadDistance = gearpitch*(gears[a]+gears[c]+gears[d]+gears[f])/(2*Math.PI);
                 const headLeadDistance = aLeadDistance+gearpitch*(headGear+gears[a])/(2*Math.PI);
+                // no collision issues
                 if ( Math.abs(error) < 0.05 && (headLeadDistance > headLead) && (aLeadDistance < aGearlead)) {
                   results.push({
                     ratio: ratio,
@@ -187,6 +200,12 @@ function calcRatios2(headGear, requestedRatio, gears, gearpitch, headLead, aGear
 
 /**
  * A-B,D-C,E= (56/A)*(B/D)*(C/E)
+ *
+ * A-B
+ * C-D
+ * E===
+ * 
+ * A+D < B+C
  */
 function calcRatios3(headGear, requestedRatio, gears, gearpitch, headLead, aGearlead) {
   let results = [];
@@ -203,8 +222,13 @@ function calcRatios3(headGear, requestedRatio, gears, gearpitch, headLead, aGear
                     const error = (ratio-requestedRatio)/requestedRatio;
                     const aLeadDistance = gearpitch*(gears[b]+gears[d]+gears[c]+gears[e])/(2*Math.PI);
                     const headLeadDistance = aLeadDistance+gearpitch*(headGear+gears[a])/(2*Math.PI);
+                    const clearance =  (gearpitch*(gears[b]+gears[d])/(2*Math.PI))-(gearpitch*(gears[a]+gears[c])/(2*Math.PI));
 
-                    if ( Math.abs(error) < 0.05 && (headLeadDistance > headLead) && (aLeadDistance < aGearlead)) {
+                    if ( Math.abs(error) < 0.05 
+                      && (headLeadDistance > headLead) 
+                      && (aLeadDistance < aGearlead)
+                      && clearance > (2*gearpitch) )  // A must not mesh with D
+                        {
                         results.push({
                           ratio: ratio,
                           layout: 3,
@@ -213,6 +237,9 @@ function calcRatios3(headGear, requestedRatio, gears, gearpitch, headLead, aGear
                           c: gears[c],
                           d: gears[d],
                           e: gears[e], 
+                          clearance: clearance,
+                          centerBD: (gearpitch*(gears[b]+gears[d])/(2*Math.PI)),
+                          centerAC: (gearpitch*(gears[a]+gears[c])/(2*Math.PI)),
                           error: error,
                           headLeadDistance: headLeadDistance,
                           aLeadDistance: aLeadDistance
@@ -245,6 +272,7 @@ function calcRatios4(headGear, requestedRatio, gears, gearpitch, headLead, aGear
             const error = (ratio-requestedRatio)/requestedRatio;
             const aLeadDistance = gearpitch*(gears[a]+2*gears[c]+gears[e])/(2*Math.PI);
             const headLeadDistance = aLeadDistance+gearpitch*(headGear+gears[a])/(2*Math.PI);
+            // no collision issues
             if ( Math.abs(error) < 0.05 && (headLeadDistance > headLead) && (aLeadDistance < aGearlead)) {
               results.push({
                 ratio: ratio ,
@@ -289,6 +317,10 @@ function updateDisplay(el, ratio ) {
   table.append(createRow([ratio.c, ratio.d],'h'));
   table.append(createRow([ratio.e, ratio.f],'h'));
   el.append(table);
+
+  console.log(ratio);
+
+
 
 /*
   const ul = document.createElement("ul");
@@ -340,7 +372,7 @@ const aGearleadIn = document.querySelector('[name="alead"]');
     [...allRatios].forEach((r) => {
       r.pitch = leadScrew*r.ratio;
       const option = document.createElement("option");
-      option.innerHTML = `layout: ${r.layout} pitch: ${r.pitch} error: ${r.error*100}%`;
+      option.innerHTML = `layout: ${r.layout} pitch: ${r.pitch} error: ${r.error*100}% clearance: ${r.clearance} `;
       option.setAttribute("ratio",JSON.stringify(r));
       select.append(option);
     });
