@@ -1,0 +1,111 @@
+<html>
+<head>
+	
+</head>
+<body>
+  <button id="load" >Load Sentences</button>
+
+	<div> Then query</div>
+	<input type="text" name="query" value="Tell me about everything you know" />
+	<button id="searchbutton" >Run Search</button>
+	<div>
+		<textarea name="result"> </textarea>
+	</div>
+
+Based on <a href="https://jinglescode.github.io/textual-similarity-universal-sentence-encoder/">https://jinglescode.github.io/textual-similarity-universal-sentence-encoder/</a>
+
+ <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
+	<script type="text/javascript">
+		
+function dotp(x, y) {
+  function dotp_sum(a, b) {
+    return a + b;
+  }
+  function dotp_times(a, i) {
+    return x[i] * y[i];
+  }
+  return x.map(dotp_times).reduce(dotp_sum, 0);
+}
+
+function cosineSimilarity(A,B){
+  var similarity = dotp(A, B) / (Math.sqrt(dotp(A,A)) * Math.sqrt(dotp(B,B)));
+  return similarity;
+}
+
+function createTensor(range, length) {
+	const tensor = [];
+	for (let j = 0; j < length; j++) {
+		tensor.push((Math.random()-0.5)*range);
+	}
+	return tensor;	
+}
+
+var dataset = [];
+var pageIndex = {};
+
+
+
+function get_embeddings(list_sentences, callback) {
+    use.load().then(model => {
+      model.embed(list_sentences).then(embeddings => {
+        callback(embeddings);
+      });
+    });
+}
+
+function search(query) {
+	console.log("Start Query");
+	const start = new Date();
+	get_embeddings([query], (embeddings) => {
+		const searchTensor = embeddings.arraySync()[0];
+		console.log(searchTensor);
+		let nmatches = 0;
+		const result = [];
+		for (var i = dataset.length - 1; i >= 0; i--) {
+			const score = cosineSimilarity(searchTensor, dataset[i]);
+			if (  score > 0.2) {
+					nmatches++;
+					result.push({ score, page: pageIndex.data[i].path })
+					console.log("Matches", pageIndex.data[i]);
+			}
+		}
+		result.sort((a,b) => {
+			return b.score - a.score;
+		});
+		console.log("Matches", nmatches);
+		const end = new Date();
+		console.log("Took ",end.getTime()-start.getTime(),"ms");
+		document.querySelector('[name="result"]').value = JSON.stringify(result,null,2);
+	});
+}
+async function loadSentences(sentences) {
+  
+	console.log("Start Create Index");
+	const start = new Date();
+  const result = await fetch("testindexdata.json");
+  pageIndex = await result.json();
+	console.log(pageIndex.data);
+	const l = [];
+	pageIndex.data.forEach((page) => {
+		l.push(page.content);
+	});
+
+	get_embeddings(l,(embeddings) => {
+		dataset = embeddings.arraySync();
+		console.log("Dataset Now", dataset);
+		const end = new Date();
+		console.log("Took ",end.getTime()-start.getTime(),"ms");
+	});
+
+}
+document.querySelector("#searchbutton").addEventListener("click",(e) => {
+	search(document.querySelector('[name="query"]').value);
+});
+document.querySelector("#load").addEventListener("click", async (e) => {
+	await loadSentences(document.querySelector('[name="sentences"]').value);
+} );
+
+	</script>
+</body>
+</html>
