@@ -79,12 +79,12 @@ function search(query) {
 		document.querySelector('[name="result"]').value = JSON.stringify(result,null,2);
 	});
 }
-async function loadSentences(sentences) {
+async function loadSentences() {
   
 	console.log("Start Create Index");
 	const start = new Date();
-  const result = await fetch("testindexdata.json");
-  pageIndex = await result.json();
+        const result = await fetch("testindexdata.json");
+        pageIndex = await result.json();
 	console.log(pageIndex.data);
 	const l = [];
 	pageIndex.data.forEach((page) => {
@@ -103,7 +103,7 @@ document.querySelector("#searchbutton").addEventListener("click",(e) => {
 	search(document.querySelector('[name="query"]').value);
 });
 document.querySelector("#load").addEventListener("click", async (e) => {
-	await loadSentences(document.querySelector('[name="sentences"]').value);
+	await loadSentences();
 } );
 
 	</script>
