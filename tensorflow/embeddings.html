@@ -46,19 +46,34 @@ function createTensor(range, length) {
 }
 
 var dataset = [];
-var pageIndex = {};
+var pageIndex = undefined;
 var model = undefined;
 
+async function measureTimeAsync(m,f) {
+	console.log("Start ",m);
+	const start = new Date();
+	const ret = await f();
+	const end = new Date();
+	console.log("End ",m, end.getTime() - start.getTime());
+	return ret;
+
+}
 
 async function get_embeddings(list_sentences, callback) {
 	if ( model === undefined ) {
-		model = await use.load();
+		model = await measureTimeAsync("Loading Model", async () => { return await use.load(); });
 	}
-	embeddings = await model.embed(list_sentences);
+	embeddings = await measureTimeAsync("Get embeddings", async () => {
+		return await model.embed(list_sentences);
+	});
 	return embeddings;
 }
 
 async function search(query) {
+	if ( dataset === undefined ) {
+		document.querySelector('[name="result"]').value = "No model loaded: Did you press Load Sentences ?";
+		return;
+	}
 	console.log("Start Query");
 	const start = new Date();
 	const searchEmbedding = await get_embeddings([query]);
@@ -66,16 +81,18 @@ async function search(query) {
 	console.log(searchTensor);
 	let nmatches = 0;
 	const result = [];
-	for (var i = dataset.length - 1; i >= 0; i--) {
-		const score = cosineSimilarity(searchTensor, dataset[i]);
-		if (  score > 0.2) {
-				nmatches++;
-				result.push({ score, page: pageIndex.data[i].path })
-				console.log("Matches", pageIndex.data[i]);
+	await measureTimeAsync("cosine ", async () => {
+		for (var i = dataset.length - 1; i >= 0; i--) {
+			const score = cosineSimilarity(searchTensor, dataset[i]);
+			if (  score > 0.2) {
+					nmatches++;
+					result.push({ score, page: pageIndex.data[i].path })
+					console.log("Matches", pageIndex.data[i]);
+			}
 		}
-	}
-	result.sort((a,b) => {
-		return b.score - a.score;
+		result.sort((a,b) => {
+			return b.score - a.score;
+		});
 	});
 	console.log("Matches", nmatches);
 	const end = new Date();
@@ -85,9 +102,9 @@ async function search(query) {
 }
 async function loadSentences() {
   
+	const start = new Date();
+	console.log("Start Create Index");
   if ( pageIndex === undefined) {
-		console.log("Start Create Index");
-		const start = new Date();
 	  const result = await fetch("testindexdata.json");
 	  pageIndex = await result.json();  	
   } 
@@ -109,6 +126,7 @@ document.querySelector("#searchbutton").addEventListener("click", async (e) => {
 document.querySelector("#load").addEventListener("click", async (e) => {
 	await loadSentences();
 });
+
 
 
 	</script>
