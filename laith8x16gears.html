@@ -80,7 +80,7 @@ Layout 1          Layout 2         Layout 3           Layout 4
 ==G               ==G              ==G                ==G
   A-B               A-h              A-B                A-h
   h D               C-D              C-D                C-h
-    F---            h-F---           E-h---             E-h---
+  h F---            h-F---           E-h---             E-h---
 </pre>
 
 <script>
@@ -104,12 +104,38 @@ every gear can be in every location
 
 */
 
+/*
+ * Calculate PCD clearance between 2 sets of gears or hubs/shafts.
+ */
+const shaftIdx = -2;
+const leadHubIdx = -3;
+function pcdClearance(gearpitch, gears, gidx, debug=false) {
+  const shafts = [  0,  0, 15, 30];
+  const gteeth = [ 10, 10, 10, 10];
+  for ( let i = 0; i < gidx.length; i++) {
+    gteeth[i] = (gidx[i]>=0)?gears[gidx[i]]:shafts[-gidx[i]];
+  }
+  if ( debug ) {
+    console.log(gteeth, gteeth[3]+gteeth[2], gteeth[0]+gteeth[1]);
+  } 
+  return  gearpitch*((gteeth[3]+gteeth[2])-(gteeth[0]+gteeth[1]))/(2*Math.PI);
+}
+
+
+
+
+
 /**
  * A-B,D,F=   (56/A)*(B/F)
  * 
  * A-B
  * h-D
  * h-F
+ * 
+ * 1 B < A
+ * 2 Ah < BD
+ * 3 hh < DF // safe to ignore
+ * 
  */
 function calcRatios1(headGear, requestedRatio, gears, gearpitch, headLead, aGearlead) {
   let results = [];
@@ -124,14 +150,17 @@ function calcRatios1(headGear, requestedRatio, gears, gearpitch, headLead, aGear
                 const error = (ratio-requestedRatio)/requestedRatio;
                 const aLeadDistance = gearpitch*(gears[b]+2*gears[d]+gears[f])/(2*Math.PI);
                 const headLeadDistance = aLeadDistance+gearpitch*(headGear+gears[a])/(2*Math.PI);
-                const clearance =  (gearpitch*gears[a]/(2*Math.PI))-(gearpitch*gears[b]/(2*Math.PI));
+                const clearance = [];
+
+                clearance.push(pcdClearance(gearpitch, gears, [ b, -1, a, -1]));
+                clearance.push(pcdClearance(gearpitch, gears, [ a, shaftIdx, b, d]));
 
                 // B has to be < A to avoid a collision
                 if ( Math.abs(error) < 0.05 
                     && (headLeadDistance > headLead) 
-                    && (aLeadDistance < aGearlead)
                     && gears[b] < gears[a] 
-                    && clearance > 2*gearpitch)  // b must not mesh with the head gear
+                    && clearance[0] > 2*gearpitch
+                    && clearance[1] > 2*gearpitch)  // b must not mesh with the head gear
                 {
                   results.push({
                     ratio: ratio,
@@ -141,6 +170,7 @@ function calcRatios1(headGear, requestedRatio, gears, gearpitch, headLead, aGear
                     d: gears[d],
                     f: gears[f], 
                     error: error,
+                    clearance: clearance,
                     headLeadDistance: headLeadDistance,
                     aLeadDistance: aLeadDistance,
                     tooShort: (headLeadDistance < headLead),
@@ -158,6 +188,14 @@ function calcRatios1(headGear, requestedRatio, gears, gearpitch, headLead, aGear
 }
 /**
  * A,C-D,F=   (56/C)*(D/F)
+ * 
+ * A-h
+ * C-D
+ * h-F
+ * 
+ * hD<AC
+ * Ch<DF
+ * 
  */
   //
 
@@ -174,8 +212,14 @@ function calcRatios2(headGear, requestedRatio, gears, gearpitch, headLead, aGear
                 const error = (ratio-requestedRatio)/requestedRatio;
                 const aLeadDistance = gearpitch*(gears[a]+gears[c]+gears[d]+gears[f])/(2*Math.PI);
                 const headLeadDistance = aLeadDistance+gearpitch*(headGear+gears[a])/(2*Math.PI);
-                // no collision issues
-                if ( Math.abs(error) < 0.05 && (headLeadDistance > headLead) && (aLeadDistance < aGearlead)) {
+                const clearance = [];
+
+                clearance.push(pcdClearance(gearpitch, gears, [ shaftIdx, d, a, c ]));
+                clearance.push(pcdClearance(gearpitch, gears, [ c, leadHubIdx, d, f  ]));
+                if ( Math.abs(error) < 0.05 
+                    && (headLeadDistance > headLead) 
+                    && clearance[0] > gearpitch*2
+                    && clearance[1] > gearpitch*2) {
                   results.push({
                     ratio: ratio,
                     layout: 2,
@@ -184,6 +228,7 @@ function calcRatios2(headGear, requestedRatio, gears, gearpitch, headLead, aGear
                     d: gears[d],
                     f: gears[f], 
                     error: error,
+                    clearance: clearance,
                     headLeadDistance: headLeadDistance,
                     aLeadDistance: aLeadDistance
                   });
@@ -203,9 +248,11 @@ function calcRatios2(headGear, requestedRatio, gears, gearpitch, headLead, aGear
  *
  * A-B
  * C-D
- * E===
+ * E-h ===
  * 
- * A+D < B+C
+ * B < A
+ * A+C < B+D
+ * Dh < CE  
  */
 function calcRatios3(headGear, requestedRatio, gears, gearpitch, headLead, aGearlead) {
   let results = [];
@@ -222,12 +269,17 @@ function calcRatios3(headGear, requestedRatio, gears, gearpitch, headLead, aGear
                     const error = (ratio-requestedRatio)/requestedRatio;
                     const aLeadDistance = gearpitch*(gears[b]+gears[d]+gears[c]+gears[e])/(2*Math.PI);
                     const headLeadDistance = aLeadDistance+gearpitch*(headGear+gears[a])/(2*Math.PI);
-                    const clearance =  (gearpitch*(gears[b]+gears[d])/(2*Math.PI))-(gearpitch*(gears[a]+gears[c])/(2*Math.PI));
+                    const clearance = [];
+                    clearance.push(pcdClearance(gearpitch, gears, [ b, -1, a, -1]));
+                    clearance.push(pcdClearance(gearpitch, gears, [ a, c, a, d ]));
+                    clearance.push(pcdClearance(gearpitch, gears, [ d, leadHubIdx, c, e]));
+
 
                     if ( Math.abs(error) < 0.05 
                       && (headLeadDistance > headLead) 
-                      && (aLeadDistance < aGearlead)
-                      && clearance > (2*gearpitch) )  // A must not mesh with D
+                      && clearance[0] > (2*gearpitch) 
+                      && clearance[1] > (2*gearpitch)
+                      && clearance[2] > (2*gearpitch))  // A must not mesh with D
                         {
                         results.push({
                           ratio: ratio,
@@ -260,6 +312,10 @@ function calcRatios3(headGear, requestedRatio, gears, gearpitch, headLead, aGear
 
 /**
  * A,C,E=     (56/E)
+ * 
+ * A h
+ * C h
+ * E h
  */
 function calcRatios4(headGear, requestedRatio, gears, gearpitch, headLead, aGearlead) {
   let results = [];
@@ -273,7 +329,9 @@ function calcRatios4(headGear, requestedRatio, gears, gearpitch, headLead, aGear
             const aLeadDistance = gearpitch*(gears[a]+2*gears[c]+gears[e])/(2*Math.PI);
             const headLeadDistance = aLeadDistance+gearpitch*(headGear+gears[a])/(2*Math.PI);
             // no collision issues
-            if ( Math.abs(error) < 0.05 && (headLeadDistance > headLead) && (aLeadDistance < aGearlead)) {
+            if ( Math.abs(error) < 0.05 
+                && (headLeadDistance > headLead) 
+                ) {
               results.push({
                 ratio: ratio ,
                 layout: 4,
@@ -281,6 +339,7 @@ function calcRatios4(headGear, requestedRatio, gears, gearpitch, headLead, aGear
                 c: gears[c],
                 e: gears[e], 
                 error: error,
+                clearance: [],
                 headLeadDistance: headLeadDistance,
                 aLeadDistance: aLeadDistance,
                 tooShort: (headLeadDistance < headLead),
