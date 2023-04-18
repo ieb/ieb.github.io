@@ -5,14 +5,24 @@
 <body>
 
 <ul>
-<li> WARNING: This page may crash browsers including Chrome, and in rare cases the OS and GPU. Do not click 
-	   "Load Sentences" if you are using an older, unsupported version of Chrome (eg 103 on OSX 10.12 or earlier), 
-	   or, if you are feeling brave, save all your work and make sure you have a backup before you do as you may have
-	 to hard reboot with a long press on the power button. If you dont believe me.... try it ;) (Issue has been reported to TensorFlow) </li>
+<li> WARNING: This page may crash you GPU. If you have older hardware, older OS or an older version of 
+Chrome, then save everything as if it does, you will have to press and hold the power button to recover.
+If in any doubt, disable the GPU in step 2.   </li>
 <li>Step 1, open Chrome Dev tools so you can see what is happening.</li>
-<li>Step 2  <button id="load" >Load Sentences</button></li>
+<li>Step 2: If you are on older hardware with limited GPU memory or WEBGL V1 then TensorFlow will likely fail,
+	  and might even crash your OS. If so you should probably disable the GPU, but this will make TensorFlow at least one 
+	  or perhaps 2 orders of magnitude slower are performing inference. After step 2, if you want to change the settings,
+	  the you must reload the page. If you want to see the internals of Tensorflow, then enable debug, but this is significantly slower again.
+	<div>
+	  GPU Enabled <input type="checkbox" name="gpuenabled" value="gpuenabled" checked /> 
+	</div>
+	<div>
+		Debug TF: <input type="checkbox" name="debugtf" value="tfdebug" /> 
+	</div>
+
+<li>Step 3:  <button id="load" >Load Sentences</button></li>
 <li>Wait for the tensors to be created, typically 10s, see js console</li>
-<li>Step 3: Run searches below, repeat Step 3 as many times as you want</li>
+<li>Step 4: Run searches below, repeat Step 3 as many times as you want</li>
 </ul>
 	<div> Then query</div>
 	<input type="text" name="query" value="Tell me about everything you know" />
@@ -22,14 +32,13 @@
 	</div>
 
 <div>
-Debug TF: <input type="checkbox" name="debugtf" value="tfdebug" /> 
-</div>
-<div>
 Based on <a href="https://jinglescode.github.io/textual-similarity-universal-sentence-encoder/">https://jinglescode.github.io/textual-similarity-universal-sentence-encoder/</a>
 </div>
 
  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
+  <script src="modeldata.js"></script>
+
 	<script type="text/javascript">
 		
 function dotp(x, y) {
@@ -56,7 +65,6 @@ function createTensor(range, length) {
 }
 
 var dataset = [];
-var pageIndex = undefined;
 var model = undefined;
 
 async function measureTimeAsync(m,f) {
@@ -111,13 +119,8 @@ async function search(query) {
 	
 }
 async function loadSentences() {
-
 	const start = new Date();
 	console.log("Start Create Index");
-  if ( pageIndex === undefined) {
-	  const result = await fetch("testindexdata.json");
-	  pageIndex = await result.json();  	
-  } 
 	console.log(pageIndex.data);
 	let l = [];
 	for (let i = 0; i < pageIndex.data.length; i++ ) {
@@ -155,6 +158,14 @@ document.querySelector('[name="debugtf"]').addEventListener("change", async (e) 
 	} else {
 		console.log("Disabling debug, using prod mode");
 		tf.enableProdMode();
+	}
+});
+document.querySelector('[name="gpuenabled"]').addEventListener("change", async (e) => {
+	if ( model === undefined ) {
+		tf.ENV.set("HAS_WEBGL", document.querySelector('[name="gpuenabled"]').checked);
+		console.log(tf.env(), document.querySelector('[name="gpuenabled"]').checked );		
+	} else {
+		console.log("Model already loaded, pleare reload to change settings");
 	}
 });
 
