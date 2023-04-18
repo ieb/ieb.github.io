@@ -21,7 +21,12 @@
 		<textarea name="result"> </textarea>
 	</div>
 
+<div>
+Debug TF: <input type="checkbox" name="debugtf" value="tfdebug" /> 
+</div>
+<div>
 Based on <a href="https://jinglescode.github.io/textual-similarity-universal-sentence-encoder/">https://jinglescode.github.io/textual-similarity-universal-sentence-encoder/</a>
+</div>
 
  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
@@ -59,7 +64,7 @@ async function measureTimeAsync(m,f) {
 	const start = new Date();
 	const ret = await f();
 	const end = new Date();
-	console.log("End ",m, end.getTime() - start.getTime());
+	console.log("End ",m, end.getTime() - start.getTime(), "ms");
 	return ret;
 
 }
@@ -106,7 +111,7 @@ async function search(query) {
 	
 }
 async function loadSentences() {
-  
+
 	const start = new Date();
 	console.log("Start Create Index");
   if ( pageIndex === undefined) {
@@ -114,16 +119,29 @@ async function loadSentences() {
 	  pageIndex = await result.json();  	
   } 
 	console.log(pageIndex.data);
-	const l = [];
-	pageIndex.data.forEach((page) => {
-		l.push(page.content);
-	});
-
-	const embeddings = await get_embeddings(l);
-	dataset = embeddings.arraySync();
+	let l = [];
+	for (let i = 0; i < pageIndex.data.length; i++ ) {
+		l.push(pageIndex.data[i].content);
+		if ( l.length > 9)  {
+			const embeddings = await get_embeddings(l);
+			embeddings.arraySync().forEach((e) => {
+				dataset.push(e);
+			});	
+			console.log("Added 10 total ",dataset.length);
+			l = [];
+		}
+	}
+	if ( l.length > 0) {
+			const embeddings = await get_embeddings(l);
+			embeddings.arraySync().forEach((e) => {
+				dataset.push(e);
+			});	
+			l = [];
+	}
 	console.log("Dataset Now", dataset);
 	const end = new Date();
 	console.log("Took ",end.getTime()-start.getTime(),"ms");
+
 }
 document.querySelector("#searchbutton").addEventListener("click", async (e) => {
 	await search(document.querySelector('[name="query"]').value);
@@ -131,6 +149,15 @@ document.querySelector("#searchbutton").addEventListener("click", async (e) => {
 document.querySelector("#load").addEventListener("click", async (e) => {
 	await loadSentences();
 });
+document.querySelector('[name="debugtf"]').addEventListener("change", async (e) => {
+	if ( document.querySelector('[name="debugtf"]').checked ) {
+		tf.enableDebugMode();
+	} else {
+		console.log("Disabling debug, using prod mode");
+		tf.enableProdMode();
+	}
+});
+
 
 
 
