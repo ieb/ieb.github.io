@@ -1,0 +1,118 @@
+<html>
+<head>
+	
+</head>
+<body>
+
+<ul>
+<li> WARNING: This page may crash you GPU. If you have older hardware, older OS or an older version of 
+Chrome, then save everything as if it does, you will have to press and hold the power button to recover.
+If in any doubt, disable the GPU in step 2.   </li>
+<li>Step 1, open Chrome Dev tools so you can see what is happening.</li>
+<li>Step 2: If you are on older hardware with limited GPU memory or WEBGL V1 then TensorFlow will likely fail,
+	  and might even crash your OS. If so you should probably disable the GPU, but this will make TensorFlow at least one 
+	  or perhaps 2 orders of magnitude slower are performing inference. After step 2, if you want to change the settings,
+	  the you must reload the page. If you want to see the internals of Tensorflow, then enable debug, but this is significantly slower again.
+	<div>
+	  GPU Enabled <input type="checkbox" name="gpuenabled" value="gpuenabled" checked /> 
+	</div>
+	<div>
+		Debug TF: <input type="checkbox" name="debugtf" value="tfdebug" /> 
+	</div>
+
+<li>Step 3:  <button id="load" >Load Sentences</button></li>
+<li>Wait for the tensors to be created, typically 10s, see js console</li>
+<li>Step 4: Run searches below, repeat Step 3 as many times as you want</li>
+</ul>
+	<div> Then query</div>
+	<input type="text" name="query" value="Tell me about everything you know" />
+	<button id="searchbutton" >Run Search</button>
+	<div>
+		<textarea name="result"> </textarea>
+	</div>
+
+
+ <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/qna"></script>
+  <script src="modeldata.js"></script>
+
+	<script type="text/javascript">
+		
+
+var dataset = [];
+var model = undefined;
+
+async function measureTimeAsync(m,f) {
+	console.log("Start ",m);
+	const start = new Date();
+	const ret = await f();
+	const end = new Date();
+	console.log("End ",m, end.getTime() - start.getTime(), "ms");
+	return ret;
+
+}
+
+async function load_model() {
+	if ( model === undefined ) {
+		model = await measureTimeAsync("Loading Model", async () => { return await qna.load(); });
+	}
+}
+
+function loadSentences() {
+	const start = new Date();
+	console.log("Start Create Index");
+	console.log(pageIndex.data);
+	let l = [];
+	for (let i = 0; i < pageIndex.data.length; i++ ) {
+		l.push(pageIndex.data[i].content);
+	}
+	dataset = l.join(" ");
+	console.log("Dataset Now", dataset);
+	const end = new Date();
+	console.log("Took ",end.getTime()-start.getTime(),"ms");
+}
+
+async function search(query) {
+	await load_model();
+	console.log("Start Query");
+	const start = new Date();
+
+	const answers = await measureTimeAsync("answers ", async () => {
+		return await model.findAnswers(query, dataset);
+  });
+	console.log("Matches", answers);
+	const end = new Date();
+	console.log("Took ",end.getTime()-start.getTime(),"ms");
+	document.querySelector('[name="result"]').value = JSON.stringify(answers,null,2);
+}
+
+document.querySelector("#searchbutton").addEventListener("click", async (e) => {
+	await search(document.querySelector('[name="query"]').value);
+});
+
+document.querySelector('[name="debugtf"]').addEventListener("change", async (e) => {
+	if ( document.querySelector('[name="debugtf"]').checked ) {
+		tf.enableDebugMode();
+	} else {
+		console.log("Disabling debug, using prod mode");
+		tf.enableProdMode();
+	}
+});
+document.querySelector('[name="gpuenabled"]').addEventListener("change", async (e) => {
+	if ( model === undefined ) {
+		tf.ENV.set("HAS_WEBGL", document.querySelector('[name="gpuenabled"]').checked);
+		console.log(tf.env(), document.querySelector('[name="gpuenabled"]').checked );		
+	} else {
+		console.log("Model already loaded, pleare reload to change settings");
+	}
+});
+
+setTimeout(async () => {
+	await loadSentences();
+},1);
+
+
+
+	</script>
+</body>
+</html>
