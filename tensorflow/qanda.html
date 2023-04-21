@@ -4,26 +4,29 @@
 </head>
 <body>
 
+<h1> Tensorflow GPU test</h1>
+<p>WARNING: This page may crash your GPU and reboot your computer. It should not, but on OSX it does.</p>
+<p>If your GPU crashes, on later versions of OSX the WindowDisplay will stop responding on watchdogd will trigger a kernel panic after 120s. On older versions of OSX the UI will freeze forever adter going blank (5m in). The only way out is to prower cycle. This behaviour varies and depends on the version of Chrome, the GPU driver and if by the time you load this page the bug causing it has been fixed.  Apple has been informed with details of how the kernel panic was triggered. Safari may do the same, but perhaps not.</p>
 <ul>
-<li> WARNING: This page may crash you GPU. If you have older hardware, older OS or an older version of 
-Chrome, then save everything as if it does, you will have to press and hold the power button to recover.
-If in any doubt, disable the GPU in step 2.   </li>
-<li>Step 1, open Chrome Dev tools so you can see what is happening.</li>
-<li>Step 2: If you are on older hardware with limited GPU memory or WEBGL V1 then TensorFlow will likely fail,
-	  and might even crash your OS. If so you should probably disable the GPU, but this will make TensorFlow at least one 
-	  or perhaps 2 orders of magnitude slower are performing inference. After step 2, if you want to change the settings,
+<li>Step 1, open Chrome Dev tools and the Chrome Task Manager so you can see what is happening.</li>
+<li>Step 2: With the GPU enabled, the code is going to overload most GPU (at least anything with <2GB ram), so disable the GPU, or save everything and see if your GPU survives. A lot depends on teh GPU driver in the OS.
+ After step 2, if you want to change the settings,
 	  the you must reload the page. If you want to see the internals of Tensorflow, then enable debug, but this is significantly slower again.
+
+
+<li>Step 3:  Click the Load sentences button.</li>
+<li>Wait for the tensors to be created, typically 10s, see js console</li>
+<li>Step 4: Run searches below, repeat Step 3 as many times as you want</li>
+</ul>
 	<div>
 	  GPU Enabled <input type="checkbox" name="gpuenabled" value="gpuenabled" checked /> 
 	</div>
 	<div>
 		Debug TF: <input type="checkbox" name="debugtf" value="tfdebug" /> 
 	</div>
-
-<li>Step 3:  <button id="load" >Load Sentences</button></li>
-<li>Wait for the tensors to be created, typically 10s, see js console</li>
-<li>Step 4: Run searches below, repeat Step 3 as many times as you want</li>
-</ul>
+	<div>
+	<button id="load" >Load Sentences</button>
+	</div>
 	<div> Then query</div>
 	<input type="text" name="query" value="Tell me about everything you know" />
 	<button id="searchbutton" >Run Search</button>
