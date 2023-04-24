@@ -1,157 +1,44 @@
 <html>
 <head>
 	
+	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
+  <script src="modeldata.js"></script>
+	<script type="text/javascript" src="embeddings.js"></script>
+
 </head>
 <body>
-
-<ul>
-<li> WARNING: This page may crash you GPU. If you have older hardware, older OS or an older version of 
-Chrome, then save everything as if it does, you will have to press and hold the power button to recover.
-If in any doubt, disable the GPU in step 2.   </li>
-<li>Step 1, open Chrome Dev tools so you can see what is happening.</li>
-<li>Step 2: If you are on older hardware with limited GPU memory or WEBGL V1 then TensorFlow will likely fail,
-	  and might even crash your OS. If so you should probably disable the GPU, but this will make TensorFlow at least one 
-	  or perhaps 2 orders of magnitude slower are performing inference. After step 2, if you want to change the settings,
-	  the you must reload the page. If you want to see the internals of Tensorflow, then enable debug, but this is significantly slower again.
 	<div>
-	  GPU Enabled <input type="checkbox" name="gpuenabled" value="gpuenabled" checked /> 
+	 GPU Enabled <input type="checkbox" name="gpuenabled" value="gpuenabled" checked /> 
 	</div>
 	<div>
 		Debug TF: <input type="checkbox" name="debugtf" value="tfdebug" /> 
 	</div>
-
-<li>Step 3:  <button id="load" >Load Sentences</button></li>
-<li>Wait for the tensors to be created, typically 10s, see js console</li>
-<li>Step 4: Run searches below, repeat Step 3 as many times as you want</li>
-</ul>
-	<div> Then query</div>
+	<div>
 	<input type="text" name="query" value="Tell me about everything you know" />
 	<button id="searchbutton" >Run Search</button>
-	<div>
-		<textarea name="result"> </textarea>
 	</div>
-
+	<textarea name="result"> </textarea>
+	<div id="results">
+	</div>
+	
 <div>
 Based on <a href="https://jinglescode.github.io/textual-similarity-universal-sentence-encoder/">https://jinglescode.github.io/textual-similarity-universal-sentence-encoder/</a>
 </div>
 
- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
-  <script src="modeldata.js"></script>
 
 	<script type="text/javascript">
 		
-function dotp(x, y) {
-  function dotp_sum(a, b) {
-    return a + b;
-  }
-  function dotp_times(a, i) {
-    return x[i] * y[i];
-  }
-  return x.map(dotp_times).reduce(dotp_sum, 0);
-}
 
-function cosineSimilarity(A,B){
-  var similarity = dotp(A, B) / (Math.sqrt(dotp(A,A)) * Math.sqrt(dotp(B,B)));
-  return similarity;
-}
+const simularitySearch = new SentenceSimularitySearch({
+	resultDiv : document.querySelector("#results"),
+	pages: pageIndex
+  });
 
-function createTensor(range, length) {
-	const tensor = [];
-	for (let j = 0; j < length; j++) {
-		tensor.push((Math.random()-0.5)*range);
-	}
-	return tensor;	
-}
-
-var dataset = [];
-var model = undefined;
-
-async function measureTimeAsync(m,f) {
-	console.log("Start ",m);
-	const start = new Date();
-	const ret = await f();
-	const end = new Date();
-	console.log("End ",m, end.getTime() - start.getTime(), "ms");
-	return ret;
-
-}
-
-async function get_embeddings(list_sentences, callback) {
-	if ( model === undefined ) {
-		model = await measureTimeAsync("Loading Model", async () => { return await use.load(); });
-	}
-	embeddings = await measureTimeAsync("Get embeddings", async () => {
-		return await model.embed(list_sentences);
-	});
-	return embeddings;
-}
-
-async function search(query) {
-	if ( dataset === undefined ) {
-		document.querySelector('[name="result"]').value = "No model loaded: Did you press Load Sentences ?";
-		return;
-	}
-	console.log("Start Query");
-	const start = new Date();
-	const searchEmbedding = await get_embeddings([query]);
-	const searchTensor = searchEmbedding.arraySync()[0];
-	console.log(searchTensor);
-	let nmatches = 0;
-	const result = [];
-	await measureTimeAsync("cosine ", async () => {
-		for (var i = dataset.length - 1; i >= 0; i--) {
-			const score = cosineSimilarity(searchTensor, dataset[i]);
-			if (  score > 0.2) {
-					nmatches++;
-					result.push({ score, page: pageIndex.data[i].path })
-					console.log("Matches", pageIndex.data[i]);
-			}
-		}
-		result.sort((a,b) => {
-			return b.score - a.score;
-		});
-	});
-	console.log("Matches", nmatches);
-	const end = new Date();
-	console.log("Took ",end.getTime()-start.getTime(),"ms");
-	document.querySelector('[name="result"]').value = JSON.stringify(result,null,2);
-	
-}
-async function loadSentences() {
-	const start = new Date();
-	console.log("Start Create Index");
-	console.log(pageIndex.data);
-	let l = [];
-	for (let i = 0; i < pageIndex.data.length; i++ ) {
-		l.push(pageIndex.data[i].content);
-		if ( l.length > 9)  {
-			const embeddings = await get_embeddings(l);
-			embeddings.arraySync().forEach((e) => {
-				dataset.push(e);
-			});	
-			console.log("Added 10 total ",dataset.length);
-			l = [];
-		}
-	}
-	if ( l.length > 0) {
-			const embeddings = await get_embeddings(l);
-			embeddings.arraySync().forEach((e) => {
-				dataset.push(e);
-			});	
-			l = [];
-	}
-	console.log("Dataset Now", dataset);
-	const end = new Date();
-	console.log("Took ",end.getTime()-start.getTime(),"ms");
-
-}
 document.querySelector("#searchbutton").addEventListener("click", async (e) => {
-	await search(document.querySelector('[name="query"]').value);
+	await simularitySearch.search(document.querySelector('[name="query"]').value);
 });
-document.querySelector("#load").addEventListener("click", async (e) => {
-	await loadSentences();
-});
+
 document.querySelector('[name="debugtf"]').addEventListener("change", async (e) => {
 	if ( document.querySelector('[name="debugtf"]').checked ) {
 		tf.enableDebugMode();

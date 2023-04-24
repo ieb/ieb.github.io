@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Generate Model</title>
+	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  	<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
+	<script type="text/javascript" src="modeldata.js"></script>
+	<script type="text/javascript" src="embeddings.js"></script>
+</head>
+<body>
+	<div>
+	  GPU Enabled <input type="checkbox" name="gpuenabled" value="gpuenabled" checked /> 
+	</div>
+	<div>
+	  LittleEndian <input type="checkbox" name="littlendian" value="littlendian" checked /> 
+	</div>
+	<div>
+	  DebugTF <input type="checkbox" name="debugtf" value="debugtf" /> 
+	</div>
+	<div>
+	  BatchSize <input type="number" name="batchSize" value="1" /> 
+	</div>
+
+	<button id="generatetensors" >Generate Tensors</button>
+
+	<div id="result">
+		
+	</div>
+
+<script type="text/javascript">
+
+
+	document.querySelector('[name="debugtf"]').addEventListener("change", async (e) => {
+		if ( document.querySelector('[name="debugtf"]').checked ) {
+			tf.enableDebugMode();
+		} else {
+			console.log("Disabling debug, using prod mode");
+			tf.enableProdMode();
+		}
+	});
+	document.querySelector('[name="gpuenabled"]').addEventListener("change", async (e) => {
+		tf.ENV.set("HAS_WEBGL", document.querySelector('[name="gpuenabled"]').checked);
+		console.log(tf.env(), document.querySelector('[name="gpuenabled"]').checked );		
+	});
+	document.querySelector("#generatetensors").addEventListener("click", async (e) => {
+		const resultDiv = document.querySelector("#result");
+		resultDiv.innerHTML = '';
+		const batchSize = document.querySelector('[name="batchSize"]').value;
+		const endianness = document.querySelector('[name="littlendian"]').checked;
+		setTimeout(async () => {
+			const embeddings = new GenerateEmbeddings({ batchSize, endianness, resultDiv, pages: pageIndex.data });
+			const url = await embeddings.getDataUrl();
+		});
+	});
+
+
+</script>
+
+</body>
+</html>
