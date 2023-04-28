@@ -186,7 +186,7 @@ class SentenceSimularitySearch {
   }
 
   cosineSimilarity(A,B){
-    var similarity = this.dotp(A, B) / (Math.sqrt(this.dotp(A,A)) * Math.sqrt(this.dotp(B,B)));
+    var similarity = this.dotp(A, B); // not reqiured A and B are normalised./ (Math.sqrt(this.dotp(A,A)) * Math.sqrt(this.dotp(B,B)));
     return similarity;
   }
 
@@ -244,12 +244,14 @@ class SentenceSimularitySearch {
     const start = new Date();
     const searchEmbedding = await this.get_embeddings([query]);
     const searchTensor = searchEmbedding.arraySync()[0];
-    console.log(searchTensor);
+    //console.log(searchTensor, this.dotp(searchTensor,searchTensor));
     let nmatches = 0;
     const result = [];
     await EmbeddingsUtils.measureTimeAsync("cosine ", async () => {
       for (var i = 0; i < this.npages; i++) {
         const pageTensor = await this.getPageTensor(i);
+      //console.log(pageTensor, this.dotp(searchTensor,searchTensor));
+
         const score = this.cosineSimilarity(searchTensor, pageTensor);
         if (  score > 0.1) {
             nmatches++;
