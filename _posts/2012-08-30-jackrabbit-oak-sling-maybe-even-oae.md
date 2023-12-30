@@ -8,7 +8,7 @@ redirect_from:
 categories: "Apache Jackrabbit, Apache Sling, Berlin, Jackrabbit, NoSQL, Sling, Tree (data structure), Uncategorized"
 hero: ../../../defaultHero.jpg
 ---
-[![](http://jackrabbit.apache.org/oak/oak.png)](http://jackrabbit.apache.org/oak/)Back in January 2010 the Jackrabbit team starting asking its community what did it want to see in the next version of [](http://jackrabbit.apache.org/oak/)[Jackrabbit](http://jackrabbit.apache.org/oak/). There were some themes in the responses. High(er) levels of write concurrency, millions of child nodes and cloud scale clustering with NoSQL backends. I voted for all of these.
+Back in January 2010 the Jackrabbit team starting asking its community what did it want to see in the next version of [](http://jackrabbit.apache.org/oak/)[Jackrabbit](http://jackrabbit.apache.org/oak/). There were some themes in the responses. High(er) levels of write concurrency, millions of child nodes and cloud scale clustering with NoSQL backends. I voted for all of these.
 
 I was reminded of this activity by the announcement of a Oak Hackathon, or rather an [Oakathon](http://wiki.apache.org/jackrabbit/Oak%20Hackathon%20September%202012) that is being organised this September at the .[adaptTo](http://adaptto.mixxt.de/) conference in Berlin. This Oakathon seems to be intended to get users upto speed on using Oak, which means that it might be ready for users to take a look. So I did. The code checks out, builds and passes all its integration tests. No surprises there from the Jackrabbit team.
 
