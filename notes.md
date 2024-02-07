@@ -41,4 +41,66 @@ but its better if to avoid this. NMEA2000 is https://github.com/ttlappalainen/NM
 | NMEA2000Shunt  | 26      | Attiny3224 | dev     | SmallNMEA2000 |
 
 
+# EM-track AIS commands 
 
+Submitted in ProAIS2
+
+To disable GPS data output over NMEA 2000 send this command:
+
+    $PSMT,0,3,0x2C75B2FA,1,n2kognss 0,0*15
+
+
+To enable it again send this command:
+
+    $PSMT,0,3,0x2C75B2FA,1,n2kognss -1,0*39
+
+To  disable PGN 129029 
+
+    $PSMT,0,3,0x2C75B2FA,1,n2kognss 0x11,0*6D
+
+To enable 
+
+
+    $PSMT,0,3,0x2C75B2FA,1,n2kognss -1,0*39
+
+
+   0 = 00000000
+  -1 = 11111111
+0x11 = 00010001 
+
+
+Other commands
+Authorise
+
+    $PSRT,012,,,(--QuaRk--)*4B
+
+
+Silent mode
+
+    $PSRT,TRG,02,33*6A
+
+Not silent
+
+    $PSRT,TRG,02,00*6A
+
+Output all alarms (for testing ?)
+
+    $PSRT,ALM,0000*45
+
+Only output active alarms
+
+    $PSRT,ALM,0001*44
+
+GPS update speed every second
+
+    $PSRT,GER,01*54
+
+Every 4s
+
+    $PSRT,GER,00*55
+
+Reset
+
+    $PSRT,RDP*6F
+
+    
