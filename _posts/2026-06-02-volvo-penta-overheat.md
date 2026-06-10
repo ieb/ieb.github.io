@@ -39,13 +39,23 @@ Last overheat I had happened in one of the largest container ports in Europe. I 
 
 Lower the water strainer so that the strainer fills with water and floods the pump at all times. Yes, there is a risk of flooding the boat if the inlet pipe and strainer get damaged, but I have eyes and don't let leaks drip for long. (almost no bilge on a Pogo1250).
 
+**Update**: This does not work, the F4B pump is above the waterline and so does not self prime. The loop of water in the pump provideds water to prime the pump and pull water in from the sea, however the pump seal must be perfect for this to work reliably.
+
+Rasing the inlet of the water into the strainer does increase the volume of water available, but the anti siphon valve must also be raised to ensure that the it still works and water doesnt siphon into the exhaust system. Carefull alignment is required for this to work.
+
 ## Fix 2
 
 Fit a capacitive water level sensor (XKC-Y25-V) on the outside of the air admittance valve to sense and turn off an alarm when there is water present at the highest point. I might also add one just above the pump so that it alarms if the pump is dry stopping the engine from being started, but Fix 1 should address that.
 
+**Update**: This does not work. The XKC-Y25-V is inconsistent sensing wet scum on the inside of the pipe, wire in the pipe and generally being an unrelable alarm mechanism.
+
+Investigating a temperature diserpation sensor, see https://github.com/ieb/FlowSensor which simulations indicate can sense air, still water and flow rates with minimal flow restriction.
+
 ## Fix 3
 
 Not sure I will do this, but who decided that a rubber impeller pump was a good idea. They don't self prime reliably. They over heat and they fail silently when they do waiting to cause an overheat. Perhaps a centrifugal pump, with almost no wearing parts below the water line, self primed by the sea would be a better approach.
+
+**Update**: Cant self prime due to the pump being above the waterline. Centrfugal pumps are used on large vessles where the pump is guarenteed to be under water all the time, but not yachts.
 
 The other posts I see a lot are "I never want to have another sailing boat with a Volvo Penta engine in it". I've had 2 in 2 boats. Neither my choice. Marinisation on the MD21-B (Peugeot 504 core engine) was a joke. I changed the first one for a VW Marine engine which was wonderfully engineered, based on the super reliable 1.9D VW Golf core engine, with real engineering care on the marinisation. Almost no metal parts in contact with sea water. O-ring seals everywhere, including the impeller cover. Same capacity as the D2-40. Impeller never failed, was several sizes larger than the puny one in a D2-40 and pumped at 2x the rate.
 
