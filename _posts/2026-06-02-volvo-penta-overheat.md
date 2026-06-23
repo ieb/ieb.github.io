@@ -41,7 +41,9 @@ Lower the water strainer so that the strainer fills with water and floods the pu
 
 **Update**: This does not work, the F4B pump is above the waterline and so does not self prime. The loop of water in the pump provideds water to prime the pump and pull water in from the sea, however the pump seal must be perfect for this to work reliably.
 
-Rasing the inlet of the water into the strainer does increase the volume of water available, but the anti siphon valve must also be raised to ensure that the it still works and water doesnt siphon into the exhaust system. Carefull alignment is required for this to work.
+Raising the inlet of the water into the strainer does increase the volume of water available, but the anti siphon valve must also be raised to ensure that the it still works and water doesn't siphon into the exhaust system. Careful alignment is required for this to work.
+
+**Update 2**: Raised inlet inside the water strainer with a raised anti siphon valve does work, but it needs careful setup to ensure the anti-siphon works on all angles of heal as the any siphon valves require > 10cm of water to allow air in.
 
 ## Fix 2
 
@@ -49,15 +51,19 @@ Fit a capacitive water level sensor (XKC-Y25-V) on the outside of the air admitt
 
 **Update**: This does not work. The XKC-Y25-V is inconsistent sensing wet scum on the inside of the pipe, wire in the pipe and generally being an unrelable alarm mechanism.
 
-Investigating a temperature diserpation sensor, see https://github.com/ieb/FlowSensor which simulations indicate can sense air, still water and flow rates with minimal flow restriction.
+Investigating a temperature dispensation sensor, see https://github.com/ieb/FlowSensor which simulations indicate can sense air, still water and flow rates with minimal flow restriction.
+
+**Update 2**: Although a temperature dispersion sensor works, there is a better simpler, way.... which, ok, might be roughly inline with VPs approach. Monitor the web exhaust elbow temperature. See https://github.com/ieb/N2KEngine/blob/main/tools/incident-analysis.md for some real data on a fast and slow overheat.
 
 ## Fix 3
 
 Not sure I will do this, but who decided that a rubber impeller pump was a good idea. They don't self prime reliably. They over heat and they fail silently when they do waiting to cause an overheat. Perhaps a centrifugal pump, with almost no wearing parts below the water line, self primed by the sea would be a better approach.
 
-**Update**: Cant self prime due to the pump being above the waterline. Centrfugal pumps are used on large vessles where the pump is guarenteed to be under water all the time, but not yachts.
+**Update**: Cant self prime due to the pump being above the waterline. Centrfugal pumps are used on large vessels where the pump is guaranteed to be under water all the time, but not yachts.
 
 The other posts I see a lot are "I never want to have another sailing boat with a Volvo Penta engine in it". I've had 2 in 2 boats. Neither my choice. Marinisation on the MD21-B (Peugeot 504 core engine) was a joke. I changed the first one for a VW Marine engine which was wonderfully engineered, based on the super reliable 1.9D VW Golf core engine, with real engineering care on the marinisation. Almost no metal parts in contact with sea water. O-ring seals everywhere, including the impeller cover. Same capacity as the D2-40. Impeller never failed, was several sizes larger than the puny one in a D2-40 and pumped at 2x the rate.
+
+**Update 2**: Well I might be eating my words once the water level in the strainer is fixed, and the raw water alarm firmware has been flashed to the engine monitoring device (not a MDI unit which only monitors engine coolant)
 
 Don't get me wrong. The build quality on a Pogo1250 is fantastic and the engine installation is also good but this builders cant fix misguided engine installation instructions, and a arrogant attitude to predicting failures. Temperature sensors are too late.
 
